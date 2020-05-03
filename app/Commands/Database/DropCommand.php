@@ -30,7 +30,8 @@ class DropCommand extends Command
      */
     public function handle(): void
     {
-        $dbName = $this->argument('name') ?: $this->getDbName();
+        $dbName = $this->argument('name') ?: $this->getConfigValue('db-name');
+        $dbName = $dbName ?: $this->getDbName();
         if (!$dbName) {
             $this->error('DB name is not specified.');
             return;

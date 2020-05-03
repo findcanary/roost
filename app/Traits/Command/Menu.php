@@ -18,13 +18,13 @@ trait Menu
      *
      * @throws \PhpSchool\CliMenu\Exception\InvalidTerminalException
      */
-    public function menu(string $title, array $options = [])
+    public function menu(string $title, array $options = []): ?string
     {
         $addMenuOption = static function (CliMenuBuilder $menuBuilder, array $options, &$optionSelected) use (&$addMenuOption) : void
         {
             foreach ($options as $value => $label) {
                 if (is_array($label)) {
-                    $menuBuilder->addSubMenu($value, function (CliMenuBuilder $subMenu) use ($value, $label, &$optionSelected, &$addMenuOption) {
+                    $menuBuilder->addSubMenu($value, static function (CliMenuBuilder $subMenu) use ($value, $label, &$optionSelected, &$addMenuOption) {
                         $subMenu->setTitle($value);
                         $subMenu->disableDefaultItems();
 
@@ -36,7 +36,7 @@ trait Menu
                 } else {
                     $menuBuilder->addMenuItem(
                         new MenuOption(
-                            $value, $label, function (CliMenu $menu) use (&$optionSelected) {
+                            $value, $label, static function (CliMenu $menu) use (&$optionSelected) {
                             $optionSelected = $menu->getSelectedItem();
                             $menu->close();
                         })
@@ -59,6 +59,6 @@ trait Menu
         $menuBuilder->setExitButtonText('Cancel');
         $menuBuilder->build()->open();
 
-        return $optionSelected instanceof MenuOption ? $optionSelected->getValue() : null;
+        return $optionSelected instanceof MenuOption ? (string)$optionSelected->getValue() : null;
     }
 }

@@ -12,6 +12,7 @@ use App\Traits\Command\Database;
 use App\Traits\Command\Progress;
 use App\Traits\Command\Dump;
 use App\Traits\Command\DbStrip;
+use App\Commands\Dump\UploadCommand;
 
 class ExportCommand extends Command
 {
@@ -23,13 +24,14 @@ class ExportCommand extends Command
      * @var string
      */
     protected $signature = self::COMMAND
-        . ' {name? : Database name}'
-        . ' {--f|file= : File name}'
+        . ' {file? : File name}'
         . ' {--t|tag= : A tag the dump file}'
+        . ' {--f|force : Overwrite file if exits}'
         . ' {--s|strip= : Tables to strip (dump only structure of those tables)}'
         . ' {--no-progress : Do not display progress}'
         . ' {--print : Print export command}'
-        . ' {--skip-filter : Do not filter DEFINER and ROW_FORMAT}';
+        . ' {--skip-filter : Do not filter DEFINER and ROW_FORMAT}'
+        . ' {--u|upload : Upload the dump to AWS}';
 
     /**
      * @var string
@@ -41,8 +43,7 @@ class ExportCommand extends Command
      */
     public function handle(): void
     {
-        $dbName = $this->argument('name') ?: $this->getConfigValue('db-name');
-        $dbName = $dbName ?: $this->getDbName();
+        $dbName = $this->getConfigValue('db-name') ?: $this->getDbName();
         if (!$dbName) {
             $this->error('DB name is not specified.');
             return;
@@ -52,9 +53,12 @@ class ExportCommand extends Command
             return;
         }
 
-        $fileName = $this->option('file');
+        $fileName = $this->argument('file');
         if (empty($fileName)) {
-            $defaultName = $this->getDefaultDumpName($dbName, $this->option('tag'));
+            $defaultName = $this->getDefaultDumpName(
+                ($this->getConfigValue('project') ?: $dbName),
+                $this->option('tag')
+            );
             $fileName = $this->option('no-interaction') ? $defaultName : $this->getDumpName($defaultName);
         }
         $dumpPath = $this->getDumpPath($this->updateDumpExtension($fileName));
@@ -124,9 +128,23 @@ class ExportCommand extends Command
             $this->line($pipe->toString());
         } else {
             $pipe->passthru();
+            $this->comment(sprintf('DB <info>%s</info> is exported to <info>%s</info>', $dbName, $dumpPath));
         }
 
-        $this->comment(sprintf('DB <info>%s</info> is exported to <info>%s</info>', $dbName, $dumpPath));
+        if (!$this->option('print') && $this->option('upload')) {
+            $this->info('Upload the dump:');
+
+            $this->call(
+                UploadCommand::COMMAND,
+                [
+                    'file' => $dumpPath,
+                    '--project' => $this->option('project'),
+                    '--no-progress' => $this->option('no-progress'),
+                    '--force' => $this->option('force'),
+                    '--quiet' => $this->option('quiet'),
+                ]
+            );
+        }
     }
 
     /**
@@ -154,7 +172,7 @@ class ExportCommand extends Command
     private function getDefaultDumpName(string $identifier, ?string $tag = null): string
     {
         $tagSuffix = !empty($tag) ? '[' . $tag . ']' : '';
-        return $identifier . '-' . gmdate('Y.m.d') . '-' . $tagSuffix . gmdate('H.i.s') . '.sql.gz';
+        return $identifier . '-' . gmdate('Y.m.d') . '-' . $tagSuffix . gmdate('His') . '.sql.gz';
     }
 
     /**

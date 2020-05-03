@@ -17,7 +17,7 @@ class CreateCommand extends Command
      * @var string
      */
     protected $signature = self::COMMAND
-        . ' {name : Database name}'
+        . ' {name? : Database name}'
         . ' {--f|force : Delete if exist}';
 
     /**
@@ -30,7 +30,12 @@ class CreateCommand extends Command
      */
     public function handle(): void
     {
-        $dbName = $this->argument('name');
+        $dbName = $this->argument('name') ?: $this->getConfigValue('db-name');
+        $dbName = $dbName ?: $this->ask('Enter Db name');
+        if (!$dbName) {
+            $this->error('DB name is not specified.');
+            return;
+        }
 
         if ($this->option('force')) {
             $this->call(DropCommand::COMMAND, ['name' => $dbName]);

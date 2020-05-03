@@ -1,0 +1,37 @@
+
+@package aws/aws-sdk-php
+
+<+>UTF-8
+===================================================================
+--- src/S3/ObjectUploader.php	(date 1588535676676)
++++ src/S3/ObjectUploader.php	(date 1588535676676)
+@@ -11,7 +11,7 @@
+  */
+ class ObjectUploader implements PromisorInterface
+ {
+-    const DEFAULT_MULTIPART_THRESHOLD = 16777216;
++    const DEFAULT_MULTIPART_THRESHOLD = 1073741824;
+
+     private $client;
+     private $bucket;
+@@ -24,7 +24,7 @@
+         'concurrency'   => 3,
+         'mup_threshold' => self::DEFAULT_MULTIPART_THRESHOLD,
+         'params'        => [],
+-        'part_size'     => null,
++        'part_size'     => 1073741824,
+     ];
+
+     /**
+===================================================================
+--- src/S3/Transfer.php	(date 1588535508756)
++++ src/S3/Transfer.php	(date 1588535508756)
+@@ -111,7 +111,7 @@
+             : MultipartUploader::DEFAULT_CONCURRENCY;
+         $this->mupThreshold = isset($options['mup_threshold'])
+             ? $options['mup_threshold']
+-            : 16777216;
++            : 1073741824;
+         if ($this->mupThreshold < MultipartUploader::PART_MIN_SIZE) {
+             throw new \InvalidArgumentException('mup_threshold must be >= 5MB');
+         }

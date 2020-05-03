@@ -12,10 +12,12 @@
     ],
     "require": {
         "php": "^7.2.5",
+        "ext-pdo": "*",
         "laravel-zero/framework": "^7.0",
         "nunomaduro/laravel-console-menu": "^3.0",
+        "league/flysystem-aws-s3-v3": "^1.0",
         "symfony/yaml": "^5.0",
-        "ext-pdo": "*"
+        "vaimo/composer-patches": "^4.20"
     },
     "autoload": {
         "psr-4": {
@@ -33,5 +35,8 @@
     },
     "minimum-stability": "dev",
     "prefer-stable": true,
-    "bin": ["dbm2"]
+    "bin": ["dbm2"],
+    "extra": {
+        "patches-search": "patches"
+    }
 }

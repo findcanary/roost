@@ -4,11 +4,34 @@ declare(strict_types = 1);
 
 namespace App\Traits\Command;
 
-use Illuminate\Support\Facades\File;
 use App\Config as AppConfig;
+use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Storage;
+use League\Flysystem\Filesystem;
 
 trait Dump
 {
+    /**
+     * @return void
+     */
+    private function initDumpDisk(): void
+    {
+        $filesystemConfig = [
+            'filesystems.disks.dump.driver' => 'local',
+            'filesystems.disks.dump.root' => $this->getDatabaseDir(),
+            'filesystems.disks.dump.disable_asserts' => true,
+        ];
+        config($filesystemConfig);
+    }
+
+    /**
+     * @return \League\Flysystem\Filesystem
+     */
+    private function getDumpDisk(): Filesystem
+    {
+        return Storage::disk('dump')->getDriver();
+    }
+
     /**
      * @param string $file
      * @return string
@@ -41,11 +64,30 @@ trait Dump
     }
 
     /**
-     * @return string[]
+     * @param string $title
+     * @return string|null
+     */
+    private function getDumpName(string $title): ?string
+    {
+        $dumpItems = $this->getDumpList();
+
+        $menuOptions = array_map(static function ($dumpItem) {
+            return sprintf(
+                '%-50s %-15s %s',
+                $dumpItem['name'],
+                $dumpItem['size'],
+                $dumpItem['date']
+            );
+        }, $dumpItems);
+
+        return $this->menu($title, $menuOptions);
+    }
+
+    /**
+     * @return string[][]
      */
     private function getDumpList(): array
     {
-        /** @var \Symfony\Component\Finder\SplFileInfo[] $files */
         $files = File::files($this->getDatabaseDir());
         $dumps = [];
         foreach ($files as $file) {

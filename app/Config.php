@@ -14,6 +14,7 @@ class Config
 
     const FILENAME = '.dbm2.yml';
 
+    const KEY_PROJECT = 'project';
     const KEY_DUMP_DIR = 'dump-dir';
 
     const KEY_DB_HOST = 'db-host';
@@ -22,13 +23,23 @@ class Config
     const KEY_DB_USERNAME = 'db-username';
     const KEY_DB_PASSWORD = 'db-password';
 
+    const KEY_AWS_REGION     = 'aws-region';
+    const KEY_AWS_BUCKET     = 'aws-bucket';
+    const KEY_AWS_ACCESS_KEY = 'aws-access-key';
+    const KEY_AWS_SECRET_KEY = 'aws-secret-key';
+
     private const CONFIG_KEYS = [
+        self::KEY_PROJECT,
         self::KEY_DUMP_DIR,
         self::KEY_DB_HOST,
         self::KEY_DB_PORT,
         self::KEY_DB_NAME,
         self::KEY_DB_PASSWORD,
         self::KEY_DB_USERNAME,
+        self::KEY_AWS_REGION,
+        self::KEY_AWS_BUCKET,
+        self::KEY_AWS_ACCESS_KEY,
+        self::KEY_AWS_SECRET_KEY,
     ];
 
     /**

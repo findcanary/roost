@@ -23,12 +23,17 @@ class Command extends BaseCommand
     {
         $this->signature .=
             ' {--m|magento-directory= : Magento root directory}'
-            . ' {--u|dump-dir= : Dumps directory}'
+            . ' {--p|project= : Project key}'
             . ' {--db-host= : Database host}'
             . ' {--db-port= : Database port}'
             . ' {--d|db-name= : Database name}'
             . ' {--db-username= : Database username}'
-            . ' {--db-password= : Database password}';
+            . ' {--db-password= : Database password}'
+            . ' {--l|dump-dir= : Local DBs storage folder}'
+            . ' {--b|aws-bucket= : AWS bucket name}'
+            . ' {--aws-access-key= : AWS access key}'
+            . ' {--aws-secret-key= : AWS secret key}'
+            . ' {--aws-region= : AWS region}';
 
         parent::configureUsingFluentDefinition();
     }

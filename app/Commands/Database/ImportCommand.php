@@ -26,8 +26,7 @@ class ImportCommand extends Command
      * @var string
      */
     protected $signature = self::COMMAND
-        . ' {name? : Database name}'
-        . ' {--f|file= : File name}'
+        . ' {file? : File name}'
         . ' {--no-progress : Do not display progress}'
         . ' {--print : Print export command}'
         . ' {--skip-filter : Do not filter DEFINER and ROW_FORMAT}';
@@ -39,20 +38,17 @@ class ImportCommand extends Command
 
     /**
      * @return void
-     *
-     * @throws \PhpSchool\CliMenu\Exception\InvalidTerminalException
      */
     public function handle(): void
     {
-        $dbName = $this->argument('name') ?: $this->getConfigValue('db-name');
-        $dbName = $dbName ?: $this->ask('Enter Db name');
+        $dbName = $this->getConfigValue('db-name') ?: $this->ask('Enter Db name');
         if (!$dbName) {
             $this->error('DB name is not specified.');
             return;
         }
 
-        $fileName = $this->option('file');
-        $fileName = $fileName || $this->option('quiet') ? $fileName : $this->getDumpName();
+        $fileName = $this->argument('file');
+        $fileName = $fileName || $this->option('quiet') ? $fileName : $this->getDumpName('Import DB');
         if ($fileName === null) {
             $this->error('Dump file is not specified.');
             return;
@@ -123,29 +119,14 @@ class ImportCommand extends Command
 
         if ($this->option('print')) {
             $this->line($pipe->toString());
-        } else {
-            $pipe->passthru();
+            return;
         }
+
+        $pipe->passthru();
 
         File::delete($tmpFilePath);
 
         $this->comment(sprintf('DB <info>%s</info> is imported from dump <info>%s</info>', $dbName, $originDbPath));
-    }
-
-    /**
-     * @return string|null
-     *
-     * @throws \PhpSchool\CliMenu\Exception\InvalidTerminalException
-     */
-    private function getDumpName(): ?string
-    {
-        $dumps = $this->getDumpList();
-
-        $options = array_map(static function ($dump) {
-            return sprintf('%-50s %-15s %s', $dump['name'], $dump['size'], $dump['date']);
-        }, $dumps);
-
-        return $this->menu('Import DB', $options);
     }
 
     /**
