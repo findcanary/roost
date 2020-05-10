@@ -29,7 +29,7 @@ class Command extends BaseCommand
             . ' {--d|db-name= : Database name}'
             . ' {--db-username= : Database username}'
             . ' {--db-password= : Database password}'
-            . ' {--l|dump-dir= : Local DBs storage folder}'
+            . ' {--g|storage= : Local DBs storage folder}'
             . ' {--b|aws-bucket= : AWS bucket name}'
             . ' {--aws-access-key= : AWS access key}'
             . ' {--aws-secret-key= : AWS secret key}'

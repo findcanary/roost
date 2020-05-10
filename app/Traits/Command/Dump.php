@@ -56,7 +56,7 @@ trait Dump
      */
     private function getDatabaseDir(): string
     {
-        $dumpDir = $this->getConfigValue(AppConfig::KEY_DUMP_DIR);
+        $dumpDir = $this->getConfigValue(AppConfig::KEY_STORAGE);
         $dumpDir = !empty($dumpDir) ? $dumpDir : getcwd();
         $dumpDir = str_replace('~', env('HOME'), $dumpDir);
 

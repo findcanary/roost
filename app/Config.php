@@ -15,7 +15,7 @@ class Config
     const FILENAME = '.dbm2.yml';
 
     const KEY_PROJECT = 'project';
-    const KEY_DUMP_DIR = 'dump-dir';
+    const KEY_STORAGE = 'storage';
 
     const KEY_DB_HOST = 'db-host';
     const KEY_DB_PORT = 'db-port';
@@ -30,7 +30,7 @@ class Config
 
     private const CONFIG_KEYS = [
         self::KEY_PROJECT,
-        self::KEY_DUMP_DIR,
+        self::KEY_STORAGE,
         self::KEY_DB_HOST,
         self::KEY_DB_PORT,
         self::KEY_DB_NAME,

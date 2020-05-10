@@ -45,7 +45,7 @@ class BackupCommand extends Command
                 '--db-name' => $this->option('db-name'),
                 '--db-username' => $this->option('db-username'),
                 '--db-password' => $this->option('db-password'),
-                '--dump-dir' => $this->option('dump-dir'),
+                '--storage' => $this->option('storage'),
                 '--aws-bucket' => $this->option('aws-bucket'),
                 '--aws-access-key' => $this->option('aws-access-key'),
                 '--aws-secret-key' => $this->option('aws-secret-key'),
