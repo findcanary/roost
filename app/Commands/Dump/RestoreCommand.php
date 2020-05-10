@@ -20,6 +20,8 @@ class RestoreCommand extends Command
      */
     protected $signature = self::COMMAND
         . ' {dump? : Dump file name}'
+        . ' {--r|most-recent : Restore most recent dump}'
+        . ' {--t|tag= : A tag the dump file}'
         . ' {--no-progress : Do not display progress}'
         . ' {--f|force : Overwrite local file if exits}'
         . ' {--k|keep-file : Keep dump file}';
@@ -34,10 +36,27 @@ class RestoreCommand extends Command
      */
     public function handle(): void
     {
+        $dump = $this->argument('dump');
+        if (empty($dump) && $this->option('most-recent')) {
+            $project = $this->getConfigValue('project');
+            if (empty($project)) {
+                $this->error('Project is not specified.');
+                return;
+            }
+
+            $tag = $this->option('tag');
+            $dump = $this->getMostRecentDump($project, $tag);
+            if (empty($dump)) {
+                $tagInfo = $tag ? sprintf(' and [%s] tag', $tag) : '';
+                $this->error(sprintf('There is not found dump for %s project%s.', $project, $tagInfo));
+                return;
+            }
+        }
+
         $this->call(
             DownloadCommand::COMMAND,
             [
-                'dump' => $this->argument('dump'),
+                'dump' => $dump,
                 '--magento-directory' => $this->option('magento-directory'),
                 '--db-host' => $this->option('db-host'),
                 '--db-port' => $this->option('db-port'),
@@ -57,5 +76,15 @@ class RestoreCommand extends Command
                 '--remove-file' => !$this->option('keep-file')
             ]
         );
+    }
+
+    private function getMostRecentDump(string $project, ?string $tag = null): ?string
+    {
+        $this->initAwsBucket();
+
+        $dumpItems = $this->getAwsProjectDumps($project, $tag);
+        $dumpItems = array_reverse($dumpItems);
+
+        return $dumpItems[0]['name'] ?? null;
     }
 }

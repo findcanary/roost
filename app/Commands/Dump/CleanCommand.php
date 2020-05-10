@@ -44,19 +44,7 @@ class CleanCommand extends Command
             return;
         }
 
-        $dumpItems = $this->getAwsDumpList()[$project] ?? [];
-        usort($dumpItems, static function (array $a, array $b) {
-            return $a['timestamp'] <=> $b['timestamp'];
-        });
-
-        $tag = $this->option('tag');
-        if (!empty($tag)) {
-            $tag = '[' . $tag . ']';
-            $dumpItems = array_filter($dumpItems, static function ($dumpItem) use ($tag) {
-                return strpos($dumpItem['name'], $tag) !== false;
-            });
-        }
-
+        $dumpItems = $this->getAwsProjectDumps($project, $this->option('tag'));
         $forDelete = array_slice($dumpItems, 0, -1 * $count);
 
         $awsDisk = $this->getAwsDisk();

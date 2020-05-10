@@ -153,4 +153,26 @@ trait AwsS3
 
         return empty($project) ? $dumps : $dumps[$project];
     }
+
+    /**
+     * @param string $project
+     * @param string|null $tag
+     * @return array
+     */
+    private function getAwsProjectDumps(string $project, ?string $tag = null): array
+    {
+        $dumpItems = $this->getAwsDumpList()[$project] ?? [];
+        usort($dumpItems, static function (array $a, array $b) {
+            return $a['timestamp'] <=> $b['timestamp'];
+        });
+
+        if (!empty($tag)) {
+            $tag = '[' . $tag . ']';
+            $dumpItems = array_filter($dumpItems, static function ($dumpItem) use ($tag) {
+                return strpos($dumpItem['name'], $tag) !== false;
+            });
+        }
+
+        return $dumpItems;
+    }
 }
