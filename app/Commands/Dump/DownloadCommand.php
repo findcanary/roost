@@ -22,7 +22,7 @@ class DownloadCommand extends Command
     protected $signature = self::COMMAND
         . ' {dump? : Dump file name}'
         . ' {--i|import : Import downloaded dump}'
-        . ' {--remove-file : Remove file after import}'
+        . ' {--r|remove-file : Remove file after import}'
         . ' {--no-progress : Do not display progress}'
         . ' {--f|force : Overwrite local file if exits}';
 

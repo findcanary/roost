@@ -21,7 +21,8 @@ class RestoreCommand extends Command
     protected $signature = self::COMMAND
         . ' {dump? : Dump file name}'
         . ' {--no-progress : Do not display progress}'
-        . ' {--f|force : Overwrite local file if exits}';
+        . ' {--f|force : Overwrite local file if exits}'
+        . ' {--k|keep-file : Keep dump file}';
 
     /**
      * @var string
@@ -53,7 +54,7 @@ class RestoreCommand extends Command
                 '--force' => $this->option('force'),
                 '--quiet' => $this->option('quiet'),
                 '--import' => true,
-                '--remove-file' => true
+                '--remove-file' => !$this->option('keep-file')
             ]
         );
     }
