@@ -12,15 +12,34 @@ trait HomeDirectory
      */
     private function isHomeDirectory(string $directoryPath): bool
     {
-        return env('HOME') === $directoryPath;
+        return $this->getHomeDirectory() === $directoryPath;
+    }
+
+    /**
+     * @return string
+     */
+    private function getHomeDirectory(): string
+    {
+        return env('HOME');
     }
 
     /**
      * @param string $directoryPath
      * @return bool
      */
-    private function isInsideHomeDirectory(string $directoryPath): bool
+    private function isRootDirectory(string $directoryPath): bool
     {
-        return strpos($directoryPath, env('HOME')) === 0;
+        return $this->getRootDirectory() === $directoryPath;
+    }
+
+    /**
+     * @return string
+     */
+    private function getRootDirectory(): string
+    {
+        $pathInPieces = explode(DIRECTORY_SEPARATOR, __DIR__);
+        $rootDir = $pathInPieces[0] ?? __DIR__;
+        $rootDir = $rootDir === '' ? DIRECTORY_SEPARATOR : $rootDir;
+        return $rootDir;
     }
 }

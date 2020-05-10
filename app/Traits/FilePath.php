@@ -23,8 +23,10 @@ trait FilePath
     {
         if (null === $path) {
             $currentPath = getcwd();
-        } elseif (strpos($path, '/') === 0) {
+        } elseif (strpos($path, DIRECTORY_SEPARATOR) === 0) {
             $currentPath = $path;
+        } elseif (strpos($path, '~') === 0) {
+            $currentPath = str_replace('~', env('HOME'), $path);
         } else {
             $currentPath = getcwd() . DIRECTORY_SEPARATOR . ltrim($path, DIRECTORY_SEPARATOR);
         }

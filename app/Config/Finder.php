@@ -48,6 +48,7 @@ class Finder
         if ($this->globalFiles === null) {
             $this->globalFiles = [];
             $this->findParentConfig($this->workingDirectory);
+            $this->findHomeConfig();
         }
         return $this->globalFiles;
     }
@@ -58,7 +59,7 @@ class Finder
      */
     private function findParentConfig(string $directoryPath): void
     {
-        if (!$this->isHomeDirectory($directoryPath) && $this->isInsideHomeDirectory($directoryPath)) {
+        if (!$this->isHomeDirectory($directoryPath) && !$this->isRootDirectory($directoryPath)) {
             $parentDirectoryPath = File::dirname($directoryPath);
             $parentDirectoryConfig = $this->buildPath([$parentDirectoryPath, ConfigProvider::FILENAME]);
             if (File::isFile($parentDirectoryConfig)) {
@@ -66,6 +67,17 @@ class Finder
             }
 
             $this->findParentConfig($parentDirectoryPath);
+        }
+    }
+
+    /**
+     * @return void
+     */
+    private function findHomeConfig(): void
+    {
+        $homeConfig = $this->buildPath([$this->getHomeDirectory(), ConfigProvider::FILENAME]);
+        if (File::isFile($homeConfig)) {
+            $this->globalFiles[] = $homeConfig;
         }
     }
 }

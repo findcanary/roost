@@ -38,9 +38,11 @@ trait Dump
      */
     private function getDumpPath(string $file): string
     {
-        if (strpos($file, '/') === 0) {
+        if (strpos($file, DIRECTORY_SEPARATOR) === 0) {
             $dbPath = $file;
-        } elseif (strpos($file, './') === 0) {
+        } elseif (strpos($file, '~') === 0) {
+            $dbPath = str_replace('~', env('HOME'), $file);
+        } elseif (strpos($file, '.' . DIRECTORY_SEPARATOR) === 0) {
             $dbPath = getcwd() . DIRECTORY_SEPARATOR . substr($file, 2);
         } else {
             $dbPath = $this->getDatabaseDir() . DIRECTORY_SEPARATOR . $file;

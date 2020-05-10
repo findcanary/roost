@@ -125,7 +125,7 @@ class Magento
         $envFilePath = $this->buildPath([$directoryPath, 'app', 'etc', 'env.php']);
         $isFileExists = File::isFile($envFilePath);
 
-        if (!$isFileExists && !$this->isHomeDirectory($directoryPath) && $this->isInsideHomeDirectory($directoryPath)) {
+        if (!$isFileExists && !$this->isHomeDirectory($directoryPath) && !$this->isRootDirectory($directoryPath)) {
             return $this->getMagentoConfig(File::dirname($directoryPath));
         }
 
