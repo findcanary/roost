@@ -172,7 +172,7 @@ class ExportCommand extends Command
     private function getDefaultDumpName(string $identifier, ?string $tag = null): string
     {
         $tagSuffix = !empty($tag) ? '[' . $tag . ']' : '';
-        return $identifier . '-' . gmdate('Y.m.d') . '-' . $tagSuffix . gmdate('His') . '.sql.gz';
+        return $identifier . '-' . gmdate('Y.m.d') . '-' . gmdate('H.i.s') . $tagSuffix . '.sql.gz';
     }
 
     /**
