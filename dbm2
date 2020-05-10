@@ -21,6 +21,19 @@ $app = require_once __DIR__.'/bootstrap/app.php';
 
 /*
 |--------------------------------------------------------------------------
+| Restart without Xdebug
+|--------------------------------------------------------------------------
+| If there is need to run allow xDebug set ROOST_ALLOW_XDEBUG=1
+| environment variable
+*/
+use Composer\XdebugHandler\XdebugHandler;
+
+$xdebug = new XdebugHandler(basename(__FILE__), '--ansi');
+$xdebug->check();
+unset($xdebug);
+
+/*
+|--------------------------------------------------------------------------
 | Run The Artisan Application
 |--------------------------------------------------------------------------
 |
