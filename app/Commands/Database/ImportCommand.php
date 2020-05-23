@@ -10,6 +10,7 @@ use App\Facades\AppConfig;
 use App\Services\Archive;
 use App\Services\Database;
 use App\Services\Dump;
+use App\Services\DumpFile;
 use App\Services\Progress;
 use App\Services\Pdo;
 use App\Shell\Pipe;
@@ -63,7 +64,7 @@ class ImportCommand extends Command
         $originDbPath = $dbPath;
 
         $fileType = File::extension($fileName);
-        if (!Database::isIncomeFileSupported($fileName)) {
+        if (!DumpFile::isIncomeFileSupported($fileName)) {
             $this->error(sprintf('The file type is not supported: %s', $fileType));
             return;
         }

@@ -96,7 +96,7 @@ class Dump
         $files = File::files(static::getDatabaseDir());
         $dumps = [];
         foreach ($files as $file) {
-            if (!$file->isFile() || !Database::isIncomeFileSupported($file->getFilename())) {
+            if (!$file->isFile() || !DumpFile::isIncomeFileSupported($file->getFilename())) {
                 continue;
             }
 

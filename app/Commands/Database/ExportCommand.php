@@ -10,6 +10,7 @@ use App\Facades\AppConfig;
 use App\Services\Archive;
 use App\Services\Database;
 use App\Services\Dump;
+use App\Services\DumpFile;
 use App\Services\DbStrip;
 use App\Services\Progress;
 use App\Services\Pdo;
@@ -182,6 +183,6 @@ class ExportCommand extends Command
      */
     private function updateDumpExtension(string $file): string
     {
-        return Database::isOutcomeFileSupported($file) ? $file : $file . '.sql.gz';
+        return DumpFile::isOutcomeFileSupported($file) ? $file : $file . '.sql.gz';
     }
 }
