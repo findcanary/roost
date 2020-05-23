@@ -1,9 +1,16 @@
 {
-    "name": "yurii/dbtoolbox",
-    "description": "Helper for working with DB",
-    "keywords": ["magento", "magneto2", "db", "dbtoolbox", "dbmanager", "console", "cli"],
+    "name": "yurii/dbmanager",
+    "description": "Helper for working with DB on macOS or linux.",
+    "keywords": [
+        "magento",
+        "magneto2",
+        "db",
+        "dbmanager",
+        "console",
+        "cli"
+    ],
     "type": "project",
-    "license": "proprietary",
+    "license": "MIT",
     "authors": [
         {
             "name": "Yurii Torbyk",
@@ -28,14 +35,9 @@
         "preferred-install": "dist",
         "optimize-autoloader": true
     },
-    "scripts": {
-        "post-create-project-cmd": [
-            "@php application app:rename"
-        ]
-    },
     "minimum-stability": "dev",
     "prefer-stable": true,
-    "bin": ["dbm2"],
+    "bin": ["roost"],
     "extra": {
         "patches-search": "patches"
     }
