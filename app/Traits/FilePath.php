@@ -6,6 +6,8 @@ namespace App\Traits;
 
 trait FilePath
 {
+    use HomeDirectory;
+
     /**
      * @param string[] $pathParts
      * @return string
@@ -26,7 +28,7 @@ trait FilePath
         } elseif (strpos($path, DIRECTORY_SEPARATOR) === 0) {
             $currentPath = $path;
         } elseif (strpos($path, '~') === 0) {
-            $currentPath = str_replace('~', env('HOME'), $path);
+            $currentPath = str_replace('~', $this->getHomeDirectory(), $path);
         } else {
             $currentPath = getcwd() . DIRECTORY_SEPARATOR . ltrim($path, DIRECTORY_SEPARATOR);
         }

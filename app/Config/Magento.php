@@ -6,13 +6,12 @@ namespace App\Config;
 
 use Illuminate\Support\Facades\File;
 use App\Config;
-use App\Traits\HomeDirectory;
 use App\Traits\FilePath;
 use App\Traits\DsnParts;
 
 class Magento
 {
-    use HomeDirectory, FilePath, DsnParts;
+    use FilePath, DsnParts;
 
     /**
      * @var string

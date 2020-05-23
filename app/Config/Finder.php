@@ -6,12 +6,11 @@ namespace App\Config;
 
 use Illuminate\Support\Facades\File;
 use App\Config as ConfigProvider;
-use App\Traits\HomeDirectory;
 use App\Traits\FilePath;
 
 class Finder
 {
-    use HomeDirectory, FilePath;
+    use FilePath;
 
     /**
      * @var string

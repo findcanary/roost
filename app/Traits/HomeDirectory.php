@@ -4,6 +4,8 @@ declare(strict_types = 1);
 
 namespace App\Traits;
 
+use Illuminate\Support\Facades\File;
+
 trait HomeDirectory
 {
     /**
@@ -18,9 +20,9 @@ trait HomeDirectory
     /**
      * @return string
      */
-    private function getHomeDirectory(): string
+    private function getHomeDirectory(): ?string
     {
-        return env('HOME');
+        return env('HOME') ?: (env('HOMEDRIVE') . env('HOMEPATH'));
     }
 
     /**
@@ -29,7 +31,7 @@ trait HomeDirectory
      */
     private function isRootDirectory(string $directoryPath): bool
     {
-        return $this->getRootDirectory() === $directoryPath;
+        return $this->getRootDirectory() === $directoryPath || File::dirname($directoryPath) === $directoryPath;
     }
 
     /**
@@ -39,7 +41,7 @@ trait HomeDirectory
     {
         $pathInPieces = explode(DIRECTORY_SEPARATOR, __DIR__);
         $rootDir = $pathInPieces[0] ?? __DIR__;
-        $rootDir = $rootDir === '' ? DIRECTORY_SEPARATOR : $rootDir;
+        $rootDir = rtrim($rootDir, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR;
         return $rootDir;
     }
 }

@@ -5,12 +5,15 @@ declare(strict_types = 1);
 namespace App\Traits\Command;
 
 use App\Config as AppConfig;
+use App\Traits\HomeDirectory;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Storage;
 use League\Flysystem\Filesystem;
 
 trait Dump
 {
+    use HomeDirectory;
+
     /**
      * @return void
      */
@@ -41,7 +44,7 @@ trait Dump
         if (strpos($file, DIRECTORY_SEPARATOR) === 0) {
             $dbPath = $file;
         } elseif (strpos($file, '~') === 0) {
-            $dbPath = str_replace('~', env('HOME'), $file);
+            $dbPath = str_replace('~', $this->getHomeDirectory(), $file);
         } elseif (strpos($file, '.' . DIRECTORY_SEPARATOR) === 0) {
             $dbPath = getcwd() . DIRECTORY_SEPARATOR . substr($file, 2);
         } else {
@@ -58,7 +61,7 @@ trait Dump
     {
         $dumpDir = $this->getConfigValue(AppConfig::KEY_STORAGE);
         $dumpDir = !empty($dumpDir) ? $dumpDir : getcwd();
-        $dumpDir = str_replace('~', env('HOME'), $dumpDir);
+        $dumpDir = str_replace('~', $this->getHomeDirectory(), $dumpDir);
 
         File::ensureDirectoryExists($dumpDir);
         $dumpDir = realpath($dumpDir);
