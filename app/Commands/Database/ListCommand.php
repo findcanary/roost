@@ -4,14 +4,15 @@ declare(strict_types = 1);
 
 namespace App\Commands\Database;
 
-use App\Command;
-use App\Traits\Command\Database;
-use App\Traits\Command\Dump;
+use LaravelZero\Framework\Commands\Command;
+use App\Traits\Command as AppCommand;
+use App\Services\Pdo;
+use App\Services\Database;
 use Symfony\Component\Console\Helper\Table;
 
 class ListCommand extends Command
 {
-    use Database, Dump;
+    use AppCommand;
 
     const COMMAND = 'db:list';
 
@@ -33,11 +34,9 @@ class ListCommand extends Command
     {
         $search = $this->argument('search');
 
-        if (!$this->validateConfiguration()) {
-            return;
-        }
+        Pdo::validateConfiguration();
 
-        $dbList = $this->getExistingDatabases();
+        $dbList = Database::getExistingDatabases();
         if (!empty($search)) {
             $dbList = array_filter($dbList, static function ($dbName) use ($search) {
                 return strpos($dbName, $search) !== false;

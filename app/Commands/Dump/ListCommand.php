@@ -4,14 +4,17 @@ declare(strict_types = 1);
 
 namespace App\Commands\Dump;
 
-use App\Command;
-use App\Traits\Command\AwsS3;
+use LaravelZero\Framework\Commands\Command;
+use App\Traits\Command as AppCommand;
+use App\Facades\AppConfig;
+use App\Services\AwsS3;
+use App\Services\FormattedFileSize;
 use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\Console\Helper\TableStyle;
 
 class ListCommand extends Command
 {
-    use AwsS3;
+    use AppCommand;
 
     const COMMAND = 'dump:list';
 
@@ -33,11 +36,11 @@ class ListCommand extends Command
     {
         $search = $this->argument('search');
 
-        $this->initAwsBucket(false);
+        AwsS3::initAwsBucket($this->output, false);
 
-        $awsDriver = $this->getAwsDisk();
+        $awsDriver = AwsS3::getAwsDisk();
 
-        $files = $awsDriver->listContents((string)$this->getConfigValue('project'), true);
+        $files = $awsDriver->listContents((string)AppConfig::getConfigValue('project'), true);
         $files = array_filter($files, static function ($file) {
             return $file['type'] === 'file';
         });
@@ -56,7 +59,7 @@ class ListCommand extends Command
 
             $tables[$file['dirname']][] = [
                 'name' => $file['basename'],
-                'size' => $this->getFormattedFileSize((float)$file['size']),
+                'size' => FormattedFileSize::getFormattedFileSize((float)$file['size']),
                 'date' => date('d M Y', $file['timestamp']),
             ];
         }

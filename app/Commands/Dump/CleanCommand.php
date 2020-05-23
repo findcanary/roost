@@ -4,13 +4,14 @@ declare(strict_types = 1);
 
 namespace App\Commands\Dump;
 
-use App\Command;
-use App\Traits\Command\Dump;
-use App\Traits\Command\AwsS3;
+use LaravelZero\Framework\Commands\Command;
+use App\Traits\Command as AppCommand;
+use App\Facades\AppConfig;
+use App\Services\AwsS3;
 
 class CleanCommand extends Command
 {
-    use Dump, AwsS3;
+    use AppCommand;
 
     const COMMAND = 'dump:clean';
 
@@ -33,23 +34,23 @@ class CleanCommand extends Command
      */
     public function handle(): void
     {
-        $this->initAwsBucket(false);
+        AwsS3::initAwsBucket($this->output, false);
 
         $count = (int)$this->argument('count');
         if ($count < 1) {
             return;
         }
 
-        $project = $this->getConfigValue('project');
+        $project = AppConfig::getConfigValue('project');
         if (empty($project)) {
             $this->error('Project is not specified.');
             return;
         }
 
-        $dumpItems = $this->getAwsProjectDumps($project, $this->option('tag'));
+        $dumpItems = AwsS3::getAwsProjectDumps($project, $this->option('tag'));
         $forDelete = array_slice($dumpItems, 0, -1 * $count);
 
-        $awsDisk = $this->getAwsDisk();
+        $awsDisk = AwsS3::getAwsDisk();
         foreach ($forDelete as $dump) {
             $awsDisk->delete($dump['path']);
         }

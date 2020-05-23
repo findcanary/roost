@@ -2,20 +2,21 @@
 
 declare(strict_types = 1);
 
-namespace App\Traits\Command;
+namespace App\Services;
 
 use App\Config\TableGroup;
+use App\Facades\AppConfig;
 
-trait DbStrip
+class DbStrip
 {
     /**
      * @param string $tables
      * @param array $existingTables
      * @return array
      */
-    private function getTableList(string $tables, array $existingTables = []): array
+    public static function getTableList(string $tables, array $existingTables = []): array
     {
-        $expandedTableList = $this->expandTableList($tables);
+        $expandedTableList = static::expandTableList($tables);
         $tablePatterns = !empty($expandedTableList) ? explode(' ', $expandedTableList) : [];
 
         sort($tablePatterns);
@@ -39,24 +40,24 @@ trait DbStrip
      * @param string $tables
      * @return string
      */
-    private function expandTableList(string $tables): string
+    private static function expandTableList(string $tables): string
     {
         $tableDefinitions = explode(' ', $tables);
 
         foreach ($tableDefinitions as $idx => $table) {
-            if (!$this->looksLikeTableDefinition($table)) {
+            if (!static::looksLikeTableDefinition($table)) {
                 continue;
             }
 
-            $tableGroup = $this->getTableDefinition($table);
+            $tableGroup = static::getTableDefinition($table);
             $tableDefinitions[$idx] = $tableGroup !== null ? implode(' ', $tableGroup->getTables()) : '';
         }
 
         $tableDefinitions = array_map('trim', $tableDefinitions);
         $tableDefinitionString = implode(' ', $tableDefinitions);
 
-        return $this->containsTableDefinition($tableDefinitionString)
-            ? $this->expandTableList($tableDefinitionString)
+        return static::containsTableDefinition($tableDefinitionString)
+            ? static::expandTableList($tableDefinitionString)
             : $tableDefinitionString;
     }
 
@@ -64,7 +65,7 @@ trait DbStrip
      * @param $string
      * @return bool
      */
-    private function looksLikeTableDefinition($string): bool
+    private static function looksLikeTableDefinition($string): bool
     {
         return 0 === strpos($string, '@');
     }
@@ -73,7 +74,7 @@ trait DbStrip
      * @param $string
      * @return bool
      */
-    private function containsTableDefinition($string): bool
+    private static function containsTableDefinition($string): bool
     {
         return strpos($string, '@') !== false;
     }
@@ -82,11 +83,11 @@ trait DbStrip
      * @param $string
      * @return \App\Config\TableGroup|null
      */
-    private function getTableDefinition($string): ?\App\Config\TableGroup
+    private static function getTableDefinition($string): ?\App\Config\TableGroup
     {
         $tableGroupId = substr($string, 1);
 
-        $tableGroups = $this->getTableGroups();
+        $tableGroups = static::getTableGroups();
         foreach ($tableGroups as $tableGroup) {
             if ($tableGroup->getId() === $tableGroupId) {
                 return $tableGroup;
@@ -99,9 +100,9 @@ trait DbStrip
     /**
      * @return TableGroup[]
      */
-    private function getTableGroups(): array
+    private static function getTableGroups(): array
     {
-        $tableGroupsConfig = $this->getConfigValue('table-groups');
+        $tableGroupsConfig = AppConfig::getConfigValue('table-groups');
         $tableGroups = [];
 
         if (!empty($tableGroupsConfig) && is_array($tableGroupsConfig)) {

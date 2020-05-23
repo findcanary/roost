@@ -6,13 +6,13 @@ namespace App;
 
 use Symfony\Component\Console\Input\InputInterface;
 use App\Config\Parser;
-use App\Traits\FilePath;
+use App\Services\FilePath;
 
 class Config
 {
-    use FilePath;
-
     const FILENAME = '.dbm2.yml';
+
+    const OPTION_MAGENTO_DIR = 'magento-directory';
 
     const KEY_PROJECT = 'project';
     const KEY_STORAGE = 'storage';
@@ -43,22 +43,9 @@ class Config
     ];
 
     /**
-     * @var \Symfony\Component\Console\Input\InputInterface
-     */
-    private $input;
-
-    /**
      * @var array
      */
     private $config;
-
-    /**
-     * @param \Symfony\Component\Console\Input\InputInterface $input
-     */
-    public function __construct(InputInterface $input)
-    {
-        $this->input = $input;
-    }
 
     /**
      * @param string $configKey
@@ -66,7 +53,6 @@ class Config
      */
     public function getConfigValue(string $configKey)
     {
-        $this->ensureAppConfigInitialized();
         $value = $this->config[$configKey] ?? null;
         return is_array($value) || null === $value ? $value : (string)$value;
     }
@@ -74,11 +60,10 @@ class Config
     /**
      * @param string $configKey
      * @param string $configValue
-     * @return string|null
+     * @return void
      */
-    public function setConfigValue(string $configKey, string $configValue): ?string
+    public function setConfigValue(string $configKey, string $configValue): void
     {
-        $this->ensureAppConfigInitialized();
         $this->config[$configKey] = $configValue;
     }
 
@@ -87,39 +72,30 @@ class Config
      */
     public function toConfigArray(): array
     {
-        $this->ensureAppConfigInitialized();
         return $this->config;
     }
 
     /**
+     * @param \Symfony\Component\Console\Input\InputInterface $input
      * @return void
      */
-    private function ensureAppConfigInitialized(): void
+    public function initializeConfig(InputInterface $input): void
     {
-        if ($this->config === null) {
-            $this->config = $this->initializeConfig();
-        }
-    }
-
-    /**
-     * @return array
-     */
-    private function initializeConfig(): array
-    {
-        $workingDirectory = $this->getCurrentPath($this->input->getOption(Command::OPTION_MAGENTO_DIR));
+        $workingDirectory = FilePath::getCurrentPath($input->getOption(self::OPTION_MAGENTO_DIR));
         $configParser = new Parser($workingDirectory);
         $configData = $configParser->toConfigArray();
-        return $this->applyInputConfig($configData);
+        $this->config = $this->applyInputConfig($configData, $input);
     }
 
     /**
      * @param array $configData
+     * @param \Symfony\Component\Console\Input\InputInterface $input
      * @return array
      */
-    private function applyInputConfig(array $configData): array
+    private function applyInputConfig(array $configData, InputInterface $input): array
     {
         foreach (self::CONFIG_KEYS as $configKey) {
-            $value = $this->input->getOption($configKey);
+            $value = $input->getOption($configKey);
             if ($value) {
                 $configData[$configKey] = $value;
             }

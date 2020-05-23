@@ -6,22 +6,16 @@ namespace App\Config;
 
 use Illuminate\Support\Facades\File;
 use App\Config;
-use App\Traits\FilePath;
-use App\Traits\DsnParts;
+use App\Services\DsnParts;
+use App\Services\FilePath;
+use App\Services\HomeDirectory;
 
 class Magento
 {
-    use FilePath, DsnParts;
-
     /**
      * @var string
      */
     private $workingDirectory;
-
-    /**
-     * @var array
-     */
-    private $env;
 
     /**
      * @param string $workingDirectory
@@ -75,7 +69,7 @@ class Magento
     private function getDatabaseInfo(array $env, string $dnsPart): ?string
     {
         $dsnString = $env['db']['connection']['default']['host'] ?? '';
-        return !empty($dsnString) ? $this->getDsnPart($dsnString, $dnsPart) : null;
+        return !empty($dsnString) ? DsnParts::getDsnPart($dsnString, $dnsPart) : null;
     }
 
     /**
@@ -121,10 +115,13 @@ class Magento
      */
     private function getMagentoConfig(string $directoryPath): ?string
     {
-        $envFilePath = $this->buildPath([$directoryPath, 'app', 'etc', 'env.php']);
+        $envFilePath = FilePath::buildPath([$directoryPath, 'app', 'etc', 'env.php']);
         $isFileExists = File::isFile($envFilePath);
 
-        if (!$isFileExists && !$this->isHomeDirectory($directoryPath) && !$this->isRootDirectory($directoryPath)) {
+        if (!$isFileExists
+            && !HomeDirectory::isHomeDirectory($directoryPath)
+            && !HomeDirectory::isRootDirectory($directoryPath)
+        ) {
             return $this->getMagentoConfig(File::dirname($directoryPath));
         }
 

@@ -4,11 +4,14 @@ declare(strict_types = 1);
 
 namespace App\Commands\Database;
 
-use App\Command;
+use LaravelZero\Framework\Commands\Command;
+use App\Traits\Command as AppCommand;
 use App\Commands\Dump\CleanCommand;
 
 class BackupCommand extends Command
 {
+    use AppCommand;
+
     const COMMAND = 'db:backup';
 
     /**

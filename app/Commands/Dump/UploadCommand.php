@@ -4,16 +4,16 @@ declare(strict_types = 1);
 
 namespace App\Commands\Dump;
 
-use App\Command;
-use App\Traits\Command\Dump;
-use App\Traits\Command\AwsS3;
-use App\Traits\Command\Menu;
-use App\Traits\Command\Database;
+use LaravelZero\Framework\Commands\Command;
+use App\Traits\Command as AppCommand;
+use App\Facades\AppConfig;
+use App\Services\AwsS3;
+use App\Services\Dump;
 use Illuminate\Support\Facades\File;
 
 class UploadCommand extends Command
 {
-    use Database, Dump, AwsS3, Menu;
+    use AppCommand;
 
     const COMMAND = 'dump:upload';
 
@@ -34,31 +34,32 @@ class UploadCommand extends Command
      * @return void
      *
      * @throws \League\Flysystem\FileExistsException
+     * @throws \PhpSchool\CliMenu\Exception\InvalidTerminalException
      */
     public function handle(): void
     {
-        $this->initDumpDisk();
+        Dump::initDumpDisk();
 
         $initProgress = !$this->option('no-progress') && !$this->option('quiet');
-        $this->initAwsBucket($initProgress);
+        AwsS3::initAwsBucket($this->output, $initProgress);
 
         $fileName = $this->argument('file');
-        $fileName = $fileName || $this->option('quiet') ? $fileName : $this->getDumpName('Upload Dump');
+        $fileName = $fileName || $this->option('quiet') ? $fileName : Dump::getDumpName('Upload Dump');
         if (empty($fileName)) {
             $this->error('Dump file is not specified.');
             return;
         }
 
-        $dbPath = $this->getDumpPath($fileName);
+        $dbPath = Dump::getDumpPath($fileName);
         if (!$this->verifyPath($dbPath)) {
             $this->error(sprintf('Passed path does not exist or not a file: %s', $dbPath));
             return;
         }
 
-        $project = $this->getConfigValue('project');
+        $project = AppConfig::getConfigValue('project');
         $awsFileName = $project ? $project . '/' . File::basename($dbPath) : File::basename($dbPath);
 
-        $awsDisk = $this->getAwsDisk();
+        $awsDisk = AwsS3::getAwsDisk();
         $hasAwsDump = $awsDisk->has($awsFileName);
         if ($hasAwsDump
             && !$this->option('force')

@@ -4,19 +4,22 @@ declare(strict_types = 1);
 
 namespace App\Commands\Database;
 
-use App\Command;
+use LaravelZero\Framework\Commands\Command;
+use App\Traits\Command as AppCommand;
+use App\Facades\AppConfig;
+use App\Services\Archive;
+use App\Services\Database;
+use App\Services\Dump;
+use App\Services\DbStrip;
+use App\Services\Progress;
+use App\Services\Pdo;
 use App\Shell\Pipe;
 use App\Shell\Command\Pv;
-use App\Traits\Command\Archive;
-use App\Traits\Command\Database;
-use App\Traits\Command\Progress;
-use App\Traits\Command\Dump;
-use App\Traits\Command\DbStrip;
 use App\Commands\Dump\UploadCommand;
 
 class ExportCommand extends Command
 {
-    use Database, Progress, Dump, DbStrip, Archive;
+    use AppCommand;
 
     const COMMAND = 'db:export';
 
@@ -43,32 +46,30 @@ class ExportCommand extends Command
      */
     public function handle(): void
     {
-        $dbName = $this->getConfigValue('db-name') ?: $this->getDbName();
+        $dbName = AppConfig::getConfigValue('db-name') ?: $this->getDbName();
         if (!$dbName) {
             $this->error('DB name is not specified.');
             return;
         }
 
-        if (!$this->validateConfiguration($dbName)) {
-            return;
-        }
+        Pdo::validateConfiguration();
 
         $fileName = $this->argument('file');
         if (empty($fileName)) {
             $defaultName = $this->getDefaultDumpName(
-                ($this->getConfigValue('project') ?: $dbName),
+                (AppConfig::getConfigValue('project') ?: $dbName),
                 $this->option('tag')
             );
             $fileName = $this->option('no-interaction') ? $defaultName : $this->getDumpName($defaultName);
         }
-        $dumpPath = $this->getDumpPath($this->updateDumpExtension($fileName));
+        $dumpPath = Dump::getDumpPath($this->updateDumpExtension($fileName));
 
         $strip = (string)$this->option('strip');
-        $stripTableList = !empty($strip) ? $this->getTableList($strip, $this->getAllTables($dbName)) : [];
+        $stripTableList = !empty($strip) ? DbStrip::getTableList($strip, Database::getAllTables($dbName)) : [];
         if (!empty($stripTableList)) {
             $structurePipe = new Pipe();
             $structurePipe->command(
-                $this->createMysqldumpCommand()
+                Database::createMysqldumpCommand()
                     ->arguments([
                         '--default-character-set=utf8',
                         '--add-drop-table',
@@ -79,10 +80,10 @@ class ExportCommand extends Command
             );
 
             if (!$this->option('skip-filter')) {
-                $structurePipe->commands($this->getFilterCommands());
+                $structurePipe->commands(Database::getFilterCommands());
             }
 
-            $this->addArchiveCommand($dumpPath, $structurePipe);
+            Archive::addArchiveCommand($dumpPath, $structurePipe);
 
             $structurePipe->getLastCommand()->output($dumpPath);
 
@@ -95,7 +96,7 @@ class ExportCommand extends Command
 
         $pipe = new Pipe();
         $pipe->command(
-            $this->createMysqldumpCommand()->arguments([
+            Database::createMysqldumpCommand()->arguments([
                 '--routines=true',
                 '--add-drop-table',
                 '--default-character-set=utf8',
@@ -110,17 +111,17 @@ class ExportCommand extends Command
             $pipe->getLastCommand()->arguments($stripTableArguments);
         }
 
-        if (!$this->option('no-progress') && !$this->option('quiet') && $this->isPvAvailable()) {
+        if (!$this->option('no-progress') && !$this->option('quiet') && Progress::isPvAvailable()) {
             $pipe->command(
                 (new Pv)->arguments(['-b', '-t', '-w', '80', '-N', 'Export'])
             );
         }
 
         if (!$this->option('skip-filter')) {
-            $pipe->commands($this->getFilterCommands());
+            $pipe->commands(Database::getFilterCommands());
         }
 
-        $this->addArchiveCommand($dumpPath, $pipe);
+        Archive::addArchiveCommand($dumpPath, $pipe);
 
         $pipe->getLastCommand()->output($dumpPath, !empty($stripTableList));
 
@@ -152,7 +153,7 @@ class ExportCommand extends Command
      */
     private function getDbName(): ?string
     {
-        return $this->askWithCompletion('Enter DB name', $this->getExistingDatabases());
+        return $this->askWithCompletion('Enter DB name', Database::getExistingDatabases());
     }
 
     /**
@@ -181,6 +182,6 @@ class ExportCommand extends Command
      */
     private function updateDumpExtension(string $file): string
     {
-        return $this->isOutcomeFileSupported($file) ? $file : $file . '.sql.gz';
+        return Database::isOutcomeFileSupported($file) ? $file : $file . '.sql.gz';
     }
 }

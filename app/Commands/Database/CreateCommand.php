@@ -4,12 +4,14 @@ declare(strict_types = 1);
 
 namespace App\Commands\Database;
 
-use App\Command;
-use App\Traits\Command\Database;
+use LaravelZero\Framework\Commands\Command;
+use App\Traits\Command as AppCommand;
+use App\Facades\AppConfig;
+use App\Services\Database;
 
 class CreateCommand extends Command
 {
-    use Database;
+    use AppCommand;
 
     const COMMAND = 'db:create';
 
@@ -30,7 +32,7 @@ class CreateCommand extends Command
      */
     public function handle(): void
     {
-        $dbName = $this->argument('name') ?: $this->getConfigValue('db-name');
+        $dbName = $this->argument('name') ?: AppConfig::getConfigValue('db-name');
         $dbName = $dbName ?: $this->ask('Enter Db name');
         if (!$dbName) {
             $this->error('DB name is not specified.');
@@ -41,9 +43,9 @@ class CreateCommand extends Command
             $this->call(DropCommand::COMMAND, ['name' => $dbName]);
         }
 
-        $this->task(sprintf('Create DB "%s" if not exists', $dbName), function () use ($dbName) {
+        $this->task(sprintf('Create DB "%s" if not exists', $dbName), static function () use ($dbName) {
             try {
-                $mysqlCommand = $this->createMysqlCommand();
+                $mysqlCommand = Database::createMysqlCommand();
                 $mysqlCommand->arguments(['-e', sprintf('CREATE DATABASE IF NOT EXISTS `%s`', $dbName)]);
                 $mysqlCommand->run();
                 $result = true;

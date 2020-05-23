@@ -4,13 +4,14 @@ declare(strict_types = 1);
 
 namespace App\Commands\Database;
 
-use App\Command;
-use App\Traits\Command\Database;
-use App\Traits\Command\Dump;
+use LaravelZero\Framework\Commands\Command;
+use App\Traits\Command as AppCommand;
+use App\Facades\AppConfig;
+use App\Services\Database;
 
 class DropCommand extends Command
 {
-    use Database, Dump;
+    use AppCommand;
 
     const COMMAND = 'db:drop';
 
@@ -30,16 +31,16 @@ class DropCommand extends Command
      */
     public function handle(): void
     {
-        $dbName = $this->argument('name') ?: $this->getConfigValue('db-name');
+        $dbName = $this->argument('name') ?: AppConfig::getConfigValue('db-name');
         $dbName = $dbName ?: $this->getDbName();
         if (!$dbName) {
             $this->error('DB name is not specified.');
             return;
         }
 
-        $this->task(sprintf('Drop DB "%s" if exists', $dbName), function () use ($dbName) {
+        $this->task(sprintf('Drop DB "%s" if exists', $dbName), static function () use ($dbName) {
             try {
-                $mysqlCommand = $this->createMysqlCommand();
+                $mysqlCommand = Database::createMysqlCommand();
                 $mysqlCommand->arguments(['-e', sprintf('DROP DATABASE IF EXISTS `%s`', $dbName)]);
                 $mysqlCommand->run();
                 $result = true;
@@ -57,6 +58,6 @@ class DropCommand extends Command
      */
     private function getDbName(): ?string
     {
-        return $this->askWithCompletion('Enter DB name', $this->getExistingDatabases());
+        return $this->askWithCompletion('Enter DB name', Database::getExistingDatabases());
     }
 }

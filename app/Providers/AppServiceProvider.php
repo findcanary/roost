@@ -5,12 +5,11 @@ namespace App\Providers;
 use Illuminate\Support\ServiceProvider;
 
 use Symfony\Component\Console\Helper\ProgressBar;
-use App\Traits\FormattedFileSize;
+use App\Services\FormattedFileSize;
+use App\Config as AppConfig;
 
 class AppServiceProvider extends ServiceProvider
 {
-    use FormattedFileSize;
-
     /**
      * @return void
      */
@@ -18,25 +17,27 @@ class AppServiceProvider extends ServiceProvider
     {
         ProgressBar::setPlaceholderFormatterDefinition(
             'current_size',
-            function (ProgressBar $progressBar, \Illuminate\Console\OutputStyle $output) {
-                return $this->getFormattedFileSize($progressBar->getProgress());
+            static function (ProgressBar $progressBar, \Illuminate\Console\OutputStyle $output) {
+                return FormattedFileSize::getFormattedFileSize($progressBar->getProgress());
             }
         );
         ProgressBar::setPlaceholderFormatterDefinition(
             'max_size',
-            function (ProgressBar $progressBar, \Illuminate\Console\OutputStyle $output) {
-                return $this->getFormattedFileSize($progressBar->getMaxSteps());
+            static function (ProgressBar $progressBar, \Illuminate\Console\OutputStyle $output) {
+                return FormattedFileSize::getFormattedFileSize($progressBar->getMaxSteps());
             }
         );
     }
 
     /**
-     * Register any application services.
-     *
      * @return void
+     *
+     * @noinspection PhpMissingParentCallCommonInspection
      */
-    public function register()
+    public function register(): void
     {
-        //
+        $this->app->bind('app-config', static function () {
+            return new AppConfig;
+        });
     }
 }

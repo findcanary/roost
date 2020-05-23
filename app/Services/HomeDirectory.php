@@ -2,25 +2,25 @@
 
 declare(strict_types = 1);
 
-namespace App\Traits;
+namespace App\Services;
 
 use Illuminate\Support\Facades\File;
 
-trait HomeDirectory
+class HomeDirectory
 {
     /**
      * @param string $directoryPath
      * @return bool
      */
-    private function isHomeDirectory(string $directoryPath): bool
+    public static function isHomeDirectory(string $directoryPath): bool
     {
-        return $this->getHomeDirectory() === $directoryPath;
+        return static::getHomeDirectory() === $directoryPath;
     }
 
     /**
      * @return string
      */
-    private function getHomeDirectory(): ?string
+    public static function getHomeDirectory(): ?string
     {
         return env('HOME') ?: (env('HOMEDRIVE') . env('HOMEPATH'));
     }
@@ -29,15 +29,15 @@ trait HomeDirectory
      * @param string $directoryPath
      * @return bool
      */
-    private function isRootDirectory(string $directoryPath): bool
+    public static function isRootDirectory(string $directoryPath): bool
     {
-        return $this->getRootDirectory() === $directoryPath || File::dirname($directoryPath) === $directoryPath;
+        return static::getRootDirectory() === $directoryPath || File::dirname($directoryPath) === $directoryPath;
     }
 
     /**
      * @return string
      */
-    private function getRootDirectory(): string
+    public static function getRootDirectory(): string
     {
         $pathInPieces = explode(DIRECTORY_SEPARATOR, __DIR__);
         $rootDir = $pathInPieces[0] ?? __DIR__;

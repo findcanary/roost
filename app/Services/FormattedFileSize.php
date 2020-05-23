@@ -2,14 +2,14 @@
 
 declare(strict_types = 1);
 
-namespace App\Traits;
+namespace App\Services;
 
-trait FormattedFileSize
+class FormattedFileSize
 {
     /**
      * @var array
      */
-    private $sizeSteps = [
+    private static $sizeSteps = [
         [
             'tag' => 'GB',
             'value' => 1024 ** 3
@@ -32,10 +32,10 @@ trait FormattedFileSize
      * @param float $size
      * @return string
      */
-    private function getFormattedFileSize(float $size): string
+    public static function getFormattedFileSize(float $size): string
     {
         $result = '0';
-        foreach ($this->sizeSteps as $sizeStep) {
+        foreach (static::$sizeSteps as $sizeStep) {
             if ($size >= $sizeStep['value']) {
                 $result = $size / $sizeStep['value'];
                 $result = str_replace('.', ',' , (string)round($result, 2)) . ' ' . $sizeStep['tag'];

@@ -6,12 +6,11 @@ namespace App\Config;
 
 use Illuminate\Support\Facades\File;
 use App\Config as ConfigProvider;
-use App\Traits\FilePath;
+use App\Services\FilePath;
+use App\Services\HomeDirectory;
 
 class Finder
 {
-    use FilePath;
-
     /**
      * @var string
      */
@@ -35,7 +34,7 @@ class Finder
      */
     public function getCurrentFile(): ?string
     {
-        $currentConfigFile = $this->buildPath([$this->workingDirectory, ConfigProvider::FILENAME]);
+        $currentConfigFile = FilePath::buildPath([$this->workingDirectory, ConfigProvider::FILENAME]);
         return File::isFile($currentConfigFile) ? $currentConfigFile : null;
     }
 
@@ -58,9 +57,9 @@ class Finder
      */
     private function findParentConfig(string $directoryPath): void
     {
-        if (!$this->isHomeDirectory($directoryPath) && !$this->isRootDirectory($directoryPath)) {
+        if (!HomeDirectory::isHomeDirectory($directoryPath) && !HomeDirectory::isRootDirectory($directoryPath)) {
             $parentDirectoryPath = File::dirname($directoryPath);
-            $parentDirectoryConfig = $this->buildPath([$parentDirectoryPath, ConfigProvider::FILENAME]);
+            $parentDirectoryConfig = FilePath::buildPath([$parentDirectoryPath, ConfigProvider::FILENAME]);
             if (File::isFile($parentDirectoryConfig)) {
                 $this->globalFiles[] = $parentDirectoryConfig;
             }
@@ -74,7 +73,7 @@ class Finder
      */
     private function findHomeConfig(): void
     {
-        $homeConfig = $this->buildPath([$this->getHomeDirectory(), ConfigProvider::FILENAME]);
+        $homeConfig = FilePath::buildPath([HomeDirectory::getHomeDirectory(), ConfigProvider::FILENAME]);
         if (File::isFile($homeConfig)) {
             $this->globalFiles[] = $homeConfig;
         }

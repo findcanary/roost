@@ -4,11 +4,15 @@ declare(strict_types = 1);
 
 namespace App\Commands\Config;
 
-use App\Command;
+use LaravelZero\Framework\Commands\Command;
+use App\Traits\Command as AppCommand;
+use App\Facades\AppConfig;
 use Symfony\Component\Yaml\Yaml;
 
 class DumpCommand extends Command
 {
+    use AppCommand;
+
     const COMMAND = 'config:dump';
 
     /**
@@ -27,10 +31,12 @@ class DumpCommand extends Command
      */
     public function handle(): void
     {
-        $config = $this->toConfigArray();
+        $configData = AppConfig::toConfigArray();
+        ksort($configData);
+
         if (!$this->option('table-groups')) {
-            unset($config['table-groups']);
+            unset($configData['table-groups']);
         }
-        $this->info(Yaml::dump($config));
+        $this->info(Yaml::dump($configData));
     }
 }

@@ -4,14 +4,14 @@ declare(strict_types = 1);
 
 namespace App\Commands\Dump;
 
-use App\Command;
-use App\Traits\Command\AwsS3;
-use App\Traits\Command\Dump;
-use App\Traits\Command\Menu;
+use LaravelZero\Framework\Commands\Command;
+use App\Traits\Command as AppCommand;
+use App\Facades\AppConfig;
+use App\Services\AwsS3;
 
 class RestoreCommand extends Command
 {
-    use Dump, AwsS3, Menu;
+    use AppCommand;
 
     const COMMAND = 'dump:restore';
 
@@ -38,7 +38,7 @@ class RestoreCommand extends Command
     {
         $dump = $this->argument('dump');
         if (empty($dump) && $this->option('most-recent')) {
-            $project = $this->getConfigValue('project');
+            $project = AppConfig::getConfigValue('project');
             if (empty($project)) {
                 $this->error('Project is not specified.');
                 return;
@@ -80,9 +80,9 @@ class RestoreCommand extends Command
 
     private function getMostRecentDump(string $project, ?string $tag = null): ?string
     {
-        $this->initAwsBucket();
+        AwsS3::initAwsBucket($this->output);
 
-        $dumpItems = $this->getAwsProjectDumps($project, $tag);
+        $dumpItems = AwsS3::getAwsProjectDumps($project, $tag);
         $dumpItems = array_reverse($dumpItems);
 
         return $dumpItems[0]['name'] ?? null;

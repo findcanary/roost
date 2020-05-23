@@ -4,13 +4,14 @@ declare(strict_types = 1);
 
 namespace App\Commands\Dump;
 
-use App\Command;
-use App\Traits\Command\AwsS3;
-use App\Traits\Command\Menu;
+use LaravelZero\Framework\Commands\Command;
+use App\Traits\Command as AppCommand;
+use App\Facades\AppConfig;
+use App\Services\AwsS3;
 
 class DeleteCommand extends Command
 {
-    use AwsS3, Menu;
+    use AppCommand;
 
     const COMMAND = 'dump:delete';
 
@@ -31,24 +32,25 @@ class DeleteCommand extends Command
      * @return void
      *
      * @throws \League\Flysystem\FileNotFoundException
+     * @throws \PhpSchool\CliMenu\Exception\InvalidTerminalException
      */
     public function handle(): void
     {
         $initProgress = !$this->option('no-progress') && !$this->option('quiet');
-        $this->initAwsBucket($initProgress);
+        AwsS3::initAwsBucket($this->output, $initProgress);
 
         // Get dump file
-        $projectPrefix = $this->getConfigValue('project') ? $this->getConfigValue('project') . '/' : '';
+        $projectPrefix = AppConfig::getConfigValue('project') ? AppConfig::getConfigValue('project') . '/' : '';
         $dumpFile = $this->argument('dump')
             ? $projectPrefix . $this->argument('dump')
-            : $this->getAwsDumpFile('Delete Dump', $this->getConfigValue('project'));
+            : AwsS3::getAwsDumpFile('Delete Dump', AppConfig::getConfigValue('project'));
         if (!$dumpFile) {
             $this->error('Dump name is not specified.');
             return;
         }
 
         // Check if the dump exit on AWS
-        $awsDisk = $this->getAwsDisk();
+        $awsDisk = AwsS3::getAwsDisk();
         $hasAwsDump = $awsDisk->has($dumpFile);
         if (!$hasAwsDump) {
             $this->error(sprintf('<comment>%s</comment> dump file is not found.', $dumpFile));

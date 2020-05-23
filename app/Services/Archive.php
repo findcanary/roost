@@ -2,19 +2,19 @@
 
 declare(strict_types = 1);
 
-namespace App\Traits\Command;
+namespace App\Services;
 
 use App\Shell\Command\Gunzip;
 use App\Shell\Command\Gzip;
 use App\Shell\Command\Unzip;
 use Illuminate\Support\Facades\File;
 
-trait Archive
+class Archive
 {
     /**
      * @var array
      */
-    private $supportedArchives = [
+    private static $supportedArchives = [
         'gz',
         'zip'
     ];
@@ -23,9 +23,9 @@ trait Archive
      * @param string $filename
      * @return bool
      */
-    private function isArchive(string $filename): bool
+    public static function isArchive(string $filename): bool
     {
-        return in_array(File::extension($filename), $this->supportedArchives, true);
+        return in_array(File::extension($filename), static::$supportedArchives, true);
     }
 
     /**
@@ -33,7 +33,7 @@ trait Archive
      * @param \App\Shell\Pipe $pipe
      * @return bool
      */
-    private function addArchiveCommand(string $filename, \App\Shell\Pipe $pipe): bool
+    public static function addArchiveCommand(string $filename, \App\Shell\Pipe $pipe): bool
     {
         $fileType = File::extension($filename);
         switch ($fileType) {
@@ -55,7 +55,7 @@ trait Archive
      * @param \App\Shell\Pipe $pipe
      * @return bool
      */
-    private function addUnarchiveCommand(string $filePath, \App\Shell\Pipe $pipe): bool
+    public static function addUnarchiveCommand(string $filePath, \App\Shell\Pipe $pipe): bool
     {
         $fileType = File::extension($filePath);
         switch ($fileType) {

@@ -2,32 +2,32 @@
 
 declare(strict_types = 1);
 
-namespace App\Traits\Command;
+namespace App\Services;
 
 use League\Flysystem\Filesystem;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Console\OutputStyle;
 use Symfony\Component\Console\Helper\ProgressBar;
-use App\Traits\FormattedFileSize;
+use App\Facades\AppConfig;
 
-trait AwsS3
+class AwsS3
 {
-    use FormattedFileSize;
-
     /**
+     * @param \Illuminate\Console\OutputStyle $output
      * @param bool $initProgress
      * @return void
      */
-    private function initAwsBucket(bool $initProgress = true): void
+    public static function initAwsBucket(OutputStyle $output, bool $initProgress = true): void
     {
         $filesystemConfig = [
             'filesystems.disks.aws.driver' => 's3',
-            'filesystems.disks.aws.bucket' => $this->getConfigValue('aws-bucket'),
-            'filesystems.disks.aws.key' => $this->getConfigValue('aws-access-key'),
-            'filesystems.disks.aws.secret' => $this->getConfigValue('aws-secret-key'),
+            'filesystems.disks.aws.bucket' => AppConfig::getConfigValue('aws-bucket'),
+            'filesystems.disks.aws.key' => AppConfig::getConfigValue('aws-access-key'),
+            'filesystems.disks.aws.secret' => AppConfig::getConfigValue('aws-secret-key'),
             'filesystems.disks.aws.disable_asserts' => true
         ];
 
-        $region = $this->getConfigValue('aws-region');
+        $region = AppConfig::getConfigValue('aws-region');
         if ($region) {
             $filesystemConfig['filesystems.disks.aws.region'] = $region;
         }
@@ -35,11 +35,16 @@ trait AwsS3
         if ($initProgress) {
             $progressBar = null;
 
-            /** @var \App\Command $this */
-            $filesystemConfig['filesystems.disks.aws.options.@http.progress'] = function ($totalDownload, $sizeDownload, $totalUpload, $sizeUpload) use (&$progressBar) {
+            /**
+             * @param int $totalDownload
+             * @param int $sizeDownload
+             * @param int $totalUpload
+             * @param int $sizeUpload
+             */
+            $filesystemConfig['filesystems.disks.aws.options.@http.progress'] = function ($totalDownload, $sizeDownload, $totalUpload, $sizeUpload) use (&$progressBar, $output) {
                 /* Download */
                 if ($progressBar === null && $totalDownload > 0 && $sizeDownload === 0) {
-                    $progressBar = new ProgressBar($this->output);
+                    $progressBar = new ProgressBar($output);
                     $progressBar->setMaxSteps($totalDownload);
                     $progressBar->setFormat('Progress: %current_size:9s%/%max_size% [%bar%] %percent:3s%%  ETA: %remaining:6s%');
                     return;
@@ -52,12 +57,12 @@ trait AwsS3
                 if ($progressBar instanceof ProgressBar && $totalDownload > 0 && $sizeDownload === $totalDownload) {
                     $progressBar->finish();
                     $progressBar = null;
-                    $this->output->writeln('');
+                    $output->writeln('');
                 }
 
                 /* Upload */
                 if ($progressBar === null && $totalUpload > 0 && $sizeUpload === 0) {
-                    $progressBar = new ProgressBar($this->output);
+                    $progressBar = new ProgressBar($output);
                     $progressBar->setMaxSteps($totalUpload);
                     $progressBar->setFormat('Progress: %current_size:9s%/%max_size% [%bar%] %percent:3s%%  ETA: %remaining:6s%');
                     return;
@@ -70,7 +75,7 @@ trait AwsS3
                 if ($progressBar instanceof ProgressBar && $sizeUpload > 0 && $sizeUpload === $totalUpload) {
                     $progressBar->finish();
                     $progressBar = null;
-                    $this->output->writeln('');
+                    $output->writeln('');
                 }
             };
         }
@@ -81,7 +86,7 @@ trait AwsS3
     /**
      * @return \League\Flysystem\Filesystem
      */
-    private function getAwsDisk(): Filesystem
+    public static function getAwsDisk(): Filesystem
     {
         return Storage::disk('aws')->getDriver();
     }
@@ -90,10 +95,12 @@ trait AwsS3
      * @param string $title
      * @param string|null $project
      * @return string|null
+     *
+     * @throws \PhpSchool\CliMenu\Exception\InvalidTerminalException
      */
-    private function getAwsDumpFile(string $title, ?string $project = null): ?string
+    public static function getAwsDumpFile(string $title, ?string $project = null): ?string
     {
-        $dumpItems = $this->getAwsDumpList();
+        $dumpItems = static::getAwsDumpList();
 
         $menuOptions = [];
         foreach ($dumpItems as $dumpFolder => $dumpFiles) {
@@ -119,14 +126,14 @@ trait AwsS3
         }
 
         $menuOptions = !empty($project) ? $menuOptions[$project] : $menuOptions;
-        return $this->menu($title, $menuOptions);
+        return Menu::menu($title, $menuOptions);
     }
 
     /**
      * @param string|null $project
      * @return array
      */
-    private function getAwsDumpList(?string $project = null): array
+    private static function getAwsDumpList(?string $project = null): array
     {
         $awsDisk = Storage::disk('aws')->getDriver();
         $dumpItems = $awsDisk->listContents('', true);
@@ -141,7 +148,7 @@ trait AwsS3
             $dumps[$dumpItem['dirname']][$dumpItem['path']] = [
                 'path' => $dumpItem['path'],
                 'name' => $dumpItem['basename'],
-                'size' => $this->getFormattedFileSize((float)$dumpItem['size']),
+                'size' => FormattedFileSize::getFormattedFileSize((float)$dumpItem['size']),
                 'date' => date('d M Y', $dumpItem['timestamp']),
                 'timestamp' => $dumpItem['timestamp'],
             ];
@@ -159,9 +166,9 @@ trait AwsS3
      * @param string|null $tag
      * @return array
      */
-    private function getAwsProjectDumps(string $project, ?string $tag = null): array
+    public static function getAwsProjectDumps(string $project, ?string $tag = null): array
     {
-        $dumpItems = $this->getAwsDumpList()[$project] ?? [];
+        $dumpItems = static::getAwsDumpList()[$project] ?? [];
         usort($dumpItems, static function (array $a, array $b) {
             return $a['timestamp'] <=> $b['timestamp'];
         });

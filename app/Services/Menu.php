@@ -2,14 +2,14 @@
 
 declare(strict_types = 1);
 
-namespace App\Traits\Command;
+namespace App\Services;
 
 use NunoMaduro\LaravelConsoleMenu\MenuOption;
 use PhpSchool\CliMenu\Action\GoBackAction;
 use PhpSchool\CliMenu\Builder\CliMenuBuilder;
 use PhpSchool\CliMenu\CliMenu;
 
-trait Menu
+class Menu
 {
     /**
      * @param string $title
@@ -18,7 +18,7 @@ trait Menu
      *
      * @throws \PhpSchool\CliMenu\Exception\InvalidTerminalException
      */
-    public function menu(string $title, array $options = []): ?string
+    public static function menu(string $title, array $options = []): ?string
     {
         $addMenuOption = static function (CliMenuBuilder $menuBuilder, array $options, &$optionSelected) use (&$addMenuOption) : void
         {

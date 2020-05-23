@@ -2,17 +2,15 @@
 
 declare(strict_types = 1);
 
-namespace App\Traits;
+namespace App\Services;
 
-trait FilePath
+class FilePath
 {
-    use HomeDirectory;
-
     /**
      * @param string[] $pathParts
      * @return string
      */
-    private function buildPath(array $pathParts): string
+    public static function buildPath(array $pathParts): string
     {
         return implode(DIRECTORY_SEPARATOR, $pathParts);
     }
@@ -21,14 +19,14 @@ trait FilePath
      * @param string|null $path
      * @return string
      */
-    private function getCurrentPath(?string $path): string
+    public static function getCurrentPath(?string $path): string
     {
         if (null === $path) {
             $currentPath = getcwd();
         } elseif (strpos($path, DIRECTORY_SEPARATOR) === 0) {
             $currentPath = $path;
         } elseif (strpos($path, '~') === 0) {
-            $currentPath = str_replace('~', $this->getHomeDirectory(), $path);
+            $currentPath = str_replace('~', HomeDirectory::getHomeDirectory(), $path);
         } else {
             $currentPath = getcwd() . DIRECTORY_SEPARATOR . ltrim($path, DIRECTORY_SEPARATOR);
         }

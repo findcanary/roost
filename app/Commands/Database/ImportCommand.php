@@ -4,21 +4,22 @@ declare(strict_types = 1);
 
 namespace App\Commands\Database;
 
-use Illuminate\Support\Facades\File;
-use App\Command;
+use LaravelZero\Framework\Commands\Command;
+use App\Traits\Command as AppCommand;
+use App\Facades\AppConfig;
+use App\Services\Archive;
+use App\Services\Database;
+use App\Services\Dump;
+use App\Services\Progress;
+use App\Services\Pdo;
 use App\Shell\Pipe;
 use App\Shell\Command\Pv;
 use App\Shell\Command\Cat;
-use App\Traits\Command\Archive;
-use App\Traits\Command\Database;
-use App\Traits\Command\Progress;
-use App\Traits\Command\Dump;
-use App\Traits\Command\Menu;
-use App\Traits\FormattedFileSize;
+use Illuminate\Support\Facades\File;
 
 class ImportCommand extends Command
 {
-    use Database, Dump, Archive, Progress, Menu, FormattedFileSize;
+    use AppCommand;
 
     const COMMAND = 'db:import';
 
@@ -41,20 +42,20 @@ class ImportCommand extends Command
      */
     public function handle(): void
     {
-        $dbName = $this->getConfigValue('db-name') ?: $this->ask('Enter Db name');
+        $dbName = AppConfig::getConfigValue('db-name') ?: $this->ask('Enter Db name');
         if (!$dbName) {
             $this->error('DB name is not specified.');
             return;
         }
 
         $fileName = $this->argument('file');
-        $fileName = $fileName || $this->option('quiet') ? $fileName : $this->getDumpName('Import DB');
+        $fileName = $fileName || $this->option('quiet') ? $fileName : Dump::getDumpName('Import DB');
         if ($fileName === null) {
             $this->error('Dump file is not specified.');
             return;
         }
 
-        $dbPath = $this->getDumpPath($fileName);
+        $dbPath = Dump::getDumpPath($fileName);
         if (!$this->verifyPath($dbPath)) {
             $this->error(sprintf('Passed path does not exist or not a file: %s', $dbPath));
             return;
@@ -62,7 +63,7 @@ class ImportCommand extends Command
         $originDbPath = $dbPath;
 
         $fileType = File::extension($fileName);
-        if (!$this->isIncomeFileSupported($fileName)) {
+        if (!Database::isIncomeFileSupported($fileName)) {
             $this->error(sprintf('The file type is not supported: %s', $fileType));
             return;
         }
@@ -71,16 +72,14 @@ class ImportCommand extends Command
             $this->call(CreateCommand::COMMAND, ['name' => $dbName, '--force' => true]);
         }
 
-        if (!$this->validateConfiguration($dbName)) {
-            return;
-        }
+        Pdo::validateConfiguration();
 
         $tmpFilePath = tempnam(env('TMPDIR'), 'dbtoolbox_');
         $pipeUnarchive = new Pipe();
-        $isUnarchive = $this->addUnarchiveCommand($dbPath, $pipeUnarchive);
+        $isUnarchive = Archive::addUnarchiveCommand($dbPath, $pipeUnarchive);
         if ($isUnarchive) {
 
-            if (!$this->option('no-progress') && !$this->option('quiet') && $this->isPvAvailable()) {
+            if (!$this->option('no-progress') && !$this->option('quiet') && Progress::isPvAvailable()) {
                 $pipeUnarchive->command(
                     (new Pv)->arguments(['-b', '-t', '-w', '80', '-N', 'Unpack'])
                 );
@@ -99,7 +98,7 @@ class ImportCommand extends Command
 
         $pipe = new Pipe();
 
-        if (!$this->option('no-progress') && !$this->option('quiet') && $this->isPvAvailable()) {
+        if (!$this->option('no-progress') && !$this->option('quiet') && Progress::isPvAvailable()) {
             $pipe->command(
                 (new Pv)->arguments([$dbPath, '-w', '80', '-N', 'Export'])
             );
@@ -110,11 +109,11 @@ class ImportCommand extends Command
         }
 
         if (!$this->option('skip-filter')) {
-            $pipe->commands($this->getFilterCommands());
+            $pipe->commands(Database::getFilterCommands());
         }
 
         $pipe->command(
-            $this->createMysqlCommand()->arguments(['--force', $dbName])
+            Database::createMysqlCommand()->arguments(['--force', $dbName])
         );
 
         if ($this->option('print')) {

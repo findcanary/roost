@@ -2,16 +2,16 @@
 
 declare(strict_types = 1);
 
-namespace App\Traits;
+namespace App\Services;
 
-trait DsnParts
+class DsnParts
 {
     /**
      * @param string $dsnString
      * @param string $part
      * @return string|null
      */
-    private function getDsnPart(string $dsnString, string $part): ?string
+    public static function getDsnPart(string $dsnString, string $part): ?string
     {
         $colonPosition = strrpos($dsnString, ':');
 

@@ -2,26 +2,24 @@
 
 declare(strict_types = 1);
 
-namespace App\Traits\Command;
+namespace App\Services;
 
-use App\Config as AppConfig;
-use App\Traits\HomeDirectory;
+use App\Config;
+use App\Facades\AppConfig;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Storage;
 use League\Flysystem\Filesystem;
 
-trait Dump
+class Dump
 {
-    use HomeDirectory;
-
     /**
      * @return void
      */
-    private function initDumpDisk(): void
+    public static function initDumpDisk(): void
     {
         $filesystemConfig = [
             'filesystems.disks.dump.driver' => 'local',
-            'filesystems.disks.dump.root' => $this->getDatabaseDir(),
+            'filesystems.disks.dump.root' => static::getDatabaseDir(),
             'filesystems.disks.dump.disable_asserts' => true,
         ];
         config($filesystemConfig);
@@ -30,7 +28,7 @@ trait Dump
     /**
      * @return \League\Flysystem\Filesystem
      */
-    private function getDumpDisk(): Filesystem
+    public static function getDumpDisk(): Filesystem
     {
         return Storage::disk('dump')->getDriver();
     }
@@ -39,16 +37,16 @@ trait Dump
      * @param string $file
      * @return string
      */
-    private function getDumpPath(string $file): string
+    public static function getDumpPath(string $file): string
     {
         if (strpos($file, DIRECTORY_SEPARATOR) === 0) {
             $dbPath = $file;
         } elseif (strpos($file, '~') === 0) {
-            $dbPath = str_replace('~', $this->getHomeDirectory(), $file);
+            $dbPath = str_replace('~', HomeDirectory::getHomeDirectory(), $file);
         } elseif (strpos($file, '.' . DIRECTORY_SEPARATOR) === 0) {
             $dbPath = getcwd() . DIRECTORY_SEPARATOR . substr($file, 2);
         } else {
-            $dbPath = $this->getDatabaseDir() . DIRECTORY_SEPARATOR . $file;
+            $dbPath = static::getDatabaseDir() . DIRECTORY_SEPARATOR . $file;
         }
 
         return $dbPath;
@@ -57,11 +55,11 @@ trait Dump
     /**
      * @return string
      */
-    private function getDatabaseDir(): string
+    private static function getDatabaseDir(): string
     {
-        $dumpDir = $this->getConfigValue(AppConfig::KEY_STORAGE);
+        $dumpDir = AppConfig::getConfigValue(Config::KEY_STORAGE);
         $dumpDir = !empty($dumpDir) ? $dumpDir : getcwd();
-        $dumpDir = str_replace('~', $this->getHomeDirectory(), $dumpDir);
+        $dumpDir = str_replace('~', HomeDirectory::getHomeDirectory(), $dumpDir);
 
         File::ensureDirectoryExists($dumpDir);
         $dumpDir = realpath($dumpDir);
@@ -71,10 +69,12 @@ trait Dump
     /**
      * @param string $title
      * @return string|null
+     *
+     * @throws \PhpSchool\CliMenu\Exception\InvalidTerminalException
      */
-    private function getDumpName(string $title): ?string
+    public static function getDumpName(string $title): ?string
     {
-        $dumpItems = $this->getDumpList();
+        $dumpItems = static::getDumpList();
 
         $menuOptions = array_map(static function ($dumpItem) {
             return sprintf(
@@ -85,25 +85,25 @@ trait Dump
             );
         }, $dumpItems);
 
-        return $this->menu($title, $menuOptions);
+        return Menu::menu($title, $menuOptions);
     }
 
     /**
      * @return string[][]
      */
-    private function getDumpList(): array
+    private static function getDumpList(): array
     {
-        $files = File::files($this->getDatabaseDir());
+        $files = File::files(static::getDatabaseDir());
         $dumps = [];
         foreach ($files as $file) {
-            if (!$file->isFile() || !in_array($file->getExtension(), $this->supportedIncomeFiles, true)) {
+            if (!$file->isFile() || !Database::isIncomeFileSupported($file->getFilename())) {
                 continue;
             }
 
             $filename = $file->getFilename();
             $dumps[$filename] = [
                 'name' => $filename,
-                'size' => $this->getFormattedFileSize($file->getSize()),
+                'size' => FormattedFileSize::getFormattedFileSize($file->getSize()),
                 'date' => date('d M Y', $file->getCTime()),
             ];
         }

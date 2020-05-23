@@ -2,24 +2,22 @@
 
 declare(strict_types = 1);
 
-namespace App\Traits\Command;
+namespace App\Services;
 
-use App\Shell\Command\Pv;
-
-trait Progress
+class Progress
 {
     /**
      * @return bool
      */
-    private function isPvAvailable(): bool
+    public static function isPvAvailable(): bool
     {
-        return !$this->isWindows() && '' !== $this->getPvLocation();
+        return !static::isWindows() && '' !== static::getPvLocation();
     }
 
     /**
      * @return string
      */
-    private function getPvLocation(): string
+    private static function getPvLocation(): string
     {
         $out = null;
         $return = null;
@@ -30,7 +28,7 @@ trait Progress
     /**
      * @return bool
      */
-    private function isWindows(): bool
+    private static function isWindows(): bool
     {
         return strtolower(substr(PHP_OS, 0, 3)) === 'win';
     }
