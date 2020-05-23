@@ -28,6 +28,8 @@ class CleanCommand extends Command
 
     /**
      * @return void
+     *
+     * @throws \League\Flysystem\FileNotFoundException
      */
     public function handle(): void
     {
@@ -49,15 +51,7 @@ class CleanCommand extends Command
 
         $awsDisk = $this->getAwsDisk();
         foreach ($forDelete as $dump) {
-            try {
-                $awsDisk->delete($dump['path']);
-            } catch (\Aws\S3\Exception\S3Exception $e) {
-                $this->error($e->getAwsErrorMessage());
-                return;
-            } catch (\Exception $e) {
-                $this->error($e->getMessage());
-                return;
-            }
+            $awsDisk->delete($dump['path']);
         }
     }
 }

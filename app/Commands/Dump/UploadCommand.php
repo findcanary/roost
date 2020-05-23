@@ -32,6 +32,8 @@ class UploadCommand extends Command
 
     /**
      * @return void
+     *
+     * @throws \League\Flysystem\FileExistsException
      */
     public function handle(): void
     {
@@ -57,16 +59,7 @@ class UploadCommand extends Command
         $awsFileName = $project ? $project . '/' . File::basename($dbPath) : File::basename($dbPath);
 
         $awsDisk = $this->getAwsDisk();
-        try {
-            $hasAwsDump = $awsDisk->has($awsFileName);
-        } catch (\Aws\S3\Exception\S3Exception $e) {
-            $this->error($e->getAwsErrorMessage());
-            return;
-        } catch (\Exception $e) {
-            $this->error($e->getMessage());
-            return;
-        }
-
+        $hasAwsDump = $awsDisk->has($awsFileName);
         if ($hasAwsDump
             && !$this->option('force')
             && !$this->confirm(sprintf('<comment>%s</comment> file already exists. Do you want to overwrite it?', $awsFileName), true)
@@ -76,16 +69,7 @@ class UploadCommand extends Command
 
         $this->info(sprintf('Uploading <comment>%s</comment>', $awsFileName));
 
-        try {
-            $awsDisk->writeStream($awsFileName, $this->readStream($dbPath));
-        } catch (\Aws\S3\Exception\S3Exception $e) {
-            $this->error($e->getAwsErrorMessage());
-            return;
-        } catch (\Exception $e) {
-            $this->error($e->getMessage());
-            return;
-        }
-
+        $awsDisk->writeStream($awsFileName, $this->readStream($dbPath));
         $this->info(sprintf('Uploaded: <comment>%s</comment>.', $awsFileName));
     }
 

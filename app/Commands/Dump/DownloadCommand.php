@@ -33,6 +33,9 @@ class DownloadCommand extends Command
 
     /**
      * @return void
+     *
+     * @throws \League\Flysystem\FileExistsException
+     * @throws \League\Flysystem\FileNotFoundException
      */
     public function handle(): void
     {
@@ -43,15 +46,9 @@ class DownloadCommand extends Command
 
         // Get dump file
         $projectPrefix = $this->getConfigValue('project') ? $this->getConfigValue('project') . '/' : '';
-        try {
-            $dumpFile = $this->argument('dump')
-                ? $projectPrefix . $this->argument('dump')
-                : $this->getAwsDumpFile('Download Dump', $this->getConfigValue('project'));
-        } catch (\Exception $e) {
-            $this->error($e->getMessage());
-            return;
-        }
-
+        $dumpFile = $this->argument('dump')
+            ? $projectPrefix . $this->argument('dump')
+            : $this->getAwsDumpFile('Download Dump', $this->getConfigValue('project'));
         if (!$dumpFile) {
             $this->error('Dump name is not specified.');
             return;
@@ -59,16 +56,7 @@ class DownloadCommand extends Command
 
         // Check if the dump exit on AWS
         $awsDisk = $this->getAwsDisk();
-        try {
-            $hasAwsDump = $awsDisk->has($dumpFile);
-        } catch (\Aws\S3\Exception\S3Exception $e) {
-            $this->error($e->getAwsErrorMessage());
-            return;
-        } catch (\Exception $e) {
-            $this->error($e->getMessage());
-            return;
-        }
-
+        $hasAwsDump = $awsDisk->has($dumpFile);
         if (!$hasAwsDump) {
             $this->error(sprintf('<comment>%s</comment> dump file is not found.', $dumpFile));
             return;
@@ -83,17 +71,7 @@ class DownloadCommand extends Command
             || $this->confirm(sprintf('<comment>%s</comment> dump already exists locally. Overwrite it?', $dbFile), true)
         ) {
             $this->info(sprintf('Downloading <comment>%s</comment>', $dumpFile));
-
-            try {
-                $dumpDisk->write($dbFile, $awsDisk->readStream($dumpFile));
-            } catch (\Aws\S3\Exception\S3Exception $e) {
-                $this->error($e->getAwsErrorMessage());
-                return;
-            } catch (\Exception $e) {
-                $this->error($e->getMessage());
-                return;
-            }
-
+            $dumpDisk->write($dbFile, $awsDisk->readStream($dumpFile));
             $this->info(sprintf('Downloaded: <comment>%s</comment>', $dumpDisk->getAdapter()->applyPathPrefix($dbFile)));
         }
 
@@ -117,6 +95,8 @@ class DownloadCommand extends Command
     /**
      * @param string $dbFile
      * @return void
+     *
+     * @throws \League\Flysystem\FileNotFoundException
      */
     private function processDeletingFile(string $dbFile): void
     {
@@ -124,11 +104,7 @@ class DownloadCommand extends Command
             return;
         }
 
-        try {
-            $dbDisk = $this->getDumpDisk();
-            $dbDisk->delete($dbFile);
-        } catch (\Exception $e) {
-            $this->error($e->getMessage());
-        }
+        $dbDisk = $this->getDumpDisk();
+        $dbDisk->delete($dbFile);
     }
 }

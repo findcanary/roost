@@ -6,7 +6,6 @@ namespace App\Commands\Dump;
 
 use App\Command;
 use App\Traits\Command\AwsS3;
-use Illuminate\Support\Collection;
 use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\Console\Helper\TableStyle;
 
@@ -38,16 +37,7 @@ class ListCommand extends Command
 
         $awsDriver = $this->getAwsDisk();
 
-        try {
-            $files = $awsDriver->listContents((string)$this->getConfigValue('project'), true);
-        } catch (\Aws\S3\Exception\S3Exception $e) {
-            $this->error($e->getAwsErrorMessage());
-            return;
-        } catch (\Exception $e) {
-            $this->error($e->getMessage());
-            return;
-        }
-
+        $files = $awsDriver->listContents((string)$this->getConfigValue('project'), true);
         $files = array_filter($files, static function ($file) {
             return $file['type'] === 'file';
         });

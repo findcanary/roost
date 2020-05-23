@@ -6,6 +6,8 @@ namespace App;
 
 use LaravelZero\Framework\Commands\Command as BaseCommand;
 use App\Config as AppConfig;
+use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Output\OutputInterface;
 
 class Command extends BaseCommand
 {
@@ -36,6 +38,25 @@ class Command extends BaseCommand
             . ' {--aws-region= : AWS region}';
 
         parent::configureUsingFluentDefinition();
+    }
+
+    /**
+     * @param \Symfony\Component\Console\Input\InputInterface $input
+     * @param \Symfony\Component\Console\Output\OutputInterface $output
+     * @return int
+     */
+    protected function execute(InputInterface $input, OutputInterface $output)
+    {
+        try {
+            return parent::execute($input, $output);
+        } catch (\Symfony\Component\Process\Exception\ProcessFailedException $e) {
+            $this->error($e->getProcess()->getErrorOutput());
+        } catch (\Aws\S3\Exception\S3Exception $e) {
+            $this->error(($e->getAwsErrorMessage() ?: $e->getMessage()));
+        } catch (\Exception $e) {
+            $this->error($e->getMessage());
+        }
+        return 0;
     }
 
     /**

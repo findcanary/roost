@@ -29,6 +29,8 @@ class DeleteCommand extends Command
 
     /**
      * @return void
+     *
+     * @throws \League\Flysystem\FileNotFoundException
      */
     public function handle(): void
     {
@@ -37,15 +39,9 @@ class DeleteCommand extends Command
 
         // Get dump file
         $projectPrefix = $this->getConfigValue('project') ? $this->getConfigValue('project') . '/' : '';
-        try {
-            $dumpFile = $this->argument('dump')
-                ? $projectPrefix . $this->argument('dump')
-                : $this->getAwsDumpFile('Delete Dump', $this->getConfigValue('project'));
-        } catch (\Exception $e) {
-            $this->error($e->getMessage());
-            return;
-        }
-
+        $dumpFile = $this->argument('dump')
+            ? $projectPrefix . $this->argument('dump')
+            : $this->getAwsDumpFile('Delete Dump', $this->getConfigValue('project'));
         if (!$dumpFile) {
             $this->error('Dump name is not specified.');
             return;
@@ -53,16 +49,7 @@ class DeleteCommand extends Command
 
         // Check if the dump exit on AWS
         $awsDisk = $this->getAwsDisk();
-        try {
-            $hasAwsDump = $awsDisk->has($dumpFile);
-        } catch (\Aws\S3\Exception\S3Exception $e) {
-            $this->error($e->getAwsErrorMessage());
-            return;
-        } catch (\Exception $e) {
-            $this->error($e->getMessage());
-            return;
-        }
-
+        $hasAwsDump = $awsDisk->has($dumpFile);
         if (!$hasAwsDump) {
             $this->error(sprintf('<comment>%s</comment> dump file is not found.', $dumpFile));
             return;
@@ -74,16 +61,7 @@ class DeleteCommand extends Command
             return;
         }
 
-        try {
-            $awsDisk->delete($dumpFile);
-        } catch (\Aws\S3\Exception\S3Exception $e) {
-            $this->error($e->getAwsErrorMessage());
-            return;
-        } catch (\Exception $e) {
-            $this->error($e->getMessage());
-            return;
-        }
-
+        $awsDisk->delete($dumpFile);
         $this->info(sprintf('Deleted <comment>%s</comment> dump.', $dumpFile));
     }
 }
