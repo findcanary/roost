@@ -21,7 +21,6 @@ class BackupCommand extends Command
         . ' {--no-progress : Do not display progress}'
         . ' {--print : Print export command}'
         . ' {--skip-filter : Do not filter DEFINER and ROW_FORMAT}'
-        . ' {--upload : Upload the dump to AWS}'
         . ' {--c|clean= : The number of latest dumps to keep}'
         . ' {--f|force : Overwrite file if exits}';
 
