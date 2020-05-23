@@ -17,7 +17,6 @@
         "nunomaduro/laravel-console-menu": "^3.0",
         "league/flysystem-aws-s3-v3": "^1.0",
         "symfony/yaml": "^5.0",
-        "composer/xdebug-handler": "^1.4",
         "vaimo/composer-patches": "^4.20"
     },
     "autoload": {
