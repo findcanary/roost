@@ -10,7 +10,7 @@ use App\Services\FilePath;
 
 class Config
 {
-    const FILENAME = '.dbm2.yml';
+    const FILENAME = '.roost.yml';
 
     const OPTION_MAGENTO_DIR = 'magento-directory';
 
