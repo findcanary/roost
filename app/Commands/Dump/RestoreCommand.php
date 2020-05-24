@@ -21,7 +21,7 @@ class RestoreCommand extends Command
     protected $signature = self::COMMAND
         . ' {dump? : Dump file name}'
         . ' {--r|most-recent : Restore most recent dump}'
-        . ' {--t|tag= : A tag the dump file}'
+        . ' {--t|tag= : A tag of the dump files}'
         . ' {--no-progress : Do not display progress}'
         . ' {--f|force : Overwrite local file if exits}'
         . ' {--k|keep-file : Keep dump file}';

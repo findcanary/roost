@@ -24,7 +24,7 @@ class DumpCommand extends Command
     /**
      * @var string
      */
-    protected $description = 'Print config values';
+    protected $description = 'Print configurations';
 
     /**
      * @return void

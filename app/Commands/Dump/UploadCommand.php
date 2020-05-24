@@ -23,7 +23,7 @@ class UploadCommand extends Command
     protected $signature = self::COMMAND
         . ' {file? : File name}'
         . ' {--no-progress : Do not display progress}'
-        . ' {--f|force : Overwrite file if exits}';
+        . ' {--f|force : Overwrite file if exits without confirmation}';
 
     /**
      * @var string

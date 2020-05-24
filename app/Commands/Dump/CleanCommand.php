@@ -20,7 +20,7 @@ class CleanCommand extends Command
      */
     protected $signature = self::COMMAND
         . ' {count : The number of latest dumps to keep}'
-        . ' {--t|tag= : A tag the dump file}';
+        . ' {--t|tag= : A tag of the dump files}';
 
     /**
      * @var string

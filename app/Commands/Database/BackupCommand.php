@@ -19,13 +19,13 @@ class BackupCommand extends Command
      */
     protected $signature = self::COMMAND
         . ' {file? : File name}'
-        . ' {--t|tag= : A tag the dump file}'
+        . ' {--t|tag= : A tag of the dump file}'
         . ' {--s|strip= : Tables to strip (dump only structure of those tables)}'
         . ' {--no-progress : Do not display progress}'
-        . ' {--print : Print export command}'
+        . ' {--print : Print command only, not run it}'
         . ' {--skip-filter : Do not filter DEFINER and ROW_FORMAT}'
-        . ' {--c|clean= : The number of latest dumps to keep}'
-        . ' {--f|force : Overwrite file if exits}';
+        . ' {--c|clean= : The number of latest dumps to keep, other will be removed}'
+        . ' {--f|force : Overwrite dump file if it already exits locally}';
 
     /**
      * @var string

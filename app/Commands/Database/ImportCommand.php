@@ -30,7 +30,7 @@ class ImportCommand extends Command
     protected $signature = self::COMMAND
         . ' {file? : File name}'
         . ' {--no-progress : Do not display progress}'
-        . ' {--print : Print export command}'
+        . ' {--print : Print command only, not run it}'
         . ' {--skip-filter : Do not filter DEFINER and ROW_FORMAT}';
 
     /**

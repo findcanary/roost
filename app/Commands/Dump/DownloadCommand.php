@@ -25,7 +25,7 @@ class DownloadCommand extends Command
         . ' {--i|import : Import downloaded dump}'
         . ' {--r|remove-file : Remove file after import}'
         . ' {--no-progress : Do not display progress}'
-        . ' {--f|force : Overwrite local file if exits}';
+        . ' {--f|force : Overwrite local file if exits without confirmation}';
 
     /**
      * @var string

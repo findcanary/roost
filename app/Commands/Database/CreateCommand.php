@@ -20,7 +20,7 @@ class CreateCommand extends Command
      */
     protected $signature = self::COMMAND
         . ' {name? : Database name}'
-        . ' {--f|force : Delete if exist}';
+        . ' {--f|force : Re-create if DB with the same name already exists}';
 
     /**
      * @var string
