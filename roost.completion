@@ -85,18 +85,6 @@ _roost()
             opts="${opts} --no-progress --force --magento-directory --project --db-host --db-port --db-name --db-username --db-password --storage --aws-bucket --aws-access-key --aws-secret-key --aws-region"
             ;;
 
-            schedule:finish)
-            opts="${opts} "
-            ;;
-
-            schedule:run)
-            opts="${opts} "
-            ;;
-
-            vendor:publish)
-            opts="${opts} --force --all --provider --tag"
-            ;;
-
         esac
 
         COMPREPLY=($(compgen -W "${opts}" -- ${cur}))
@@ -107,7 +95,7 @@ _roost()
 
     # completing for a command
     if [[ $cur == $com ]]; then
-        coms="help list config:dump db:backup db:create db:drop db:export db:import db:list dump:clean dump:delete dump:download dump:list dump:restore dump:upload schedule:finish schedule:run vendor:publish"
+        coms="help list config:dump db:backup db:create db:drop db:export db:import db:list dump:clean dump:delete dump:download dump:list dump:restore dump:upload"
 
         COMPREPLY=($(compgen -W "${coms}" -- ${cur}))
         __ltrim_colon_completions "$cur"
