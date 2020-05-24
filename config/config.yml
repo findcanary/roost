@@ -1,3 +1,7 @@
+
+menu-foreground-colour: 'green'
+menu-background-colour: 'black'
+
 # Source: https://github.com/netz98/n98-magerun2/blob/master/config.yaml
 table-groups:
   - id: admin

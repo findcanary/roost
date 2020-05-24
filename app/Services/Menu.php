@@ -8,6 +8,7 @@ use NunoMaduro\LaravelConsoleMenu\MenuOption;
 use PhpSchool\CliMenu\Action\GoBackAction;
 use PhpSchool\CliMenu\Builder\CliMenuBuilder;
 use PhpSchool\CliMenu\CliMenu;
+use App\Facades\AppConfig;
 
 class Menu
 {
@@ -49,8 +50,8 @@ class Menu
         $menuBuilder->setTitle($title);
         $menuBuilder->setWidth(110);
         $menuBuilder->setTitleSeparator('=');
-        $menuBuilder->setForegroundColour('green');
-        $menuBuilder->setBackgroundColour('black');
+        $menuBuilder->setForegroundColour(AppConfig::getConfigValue('menu-foreground-colour'));
+        $menuBuilder->setBackgroundColour(AppConfig::getConfigValue('menu-background-colour'));
 
         $optionSelected = null;
         $addMenuOption($menuBuilder, $options, $optionSelected);
