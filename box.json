@@ -1,4 +1,5 @@
 {
+    "shebang": "#!/usr/bin/env php",
     "chmod": "0755",
     "directories": [
         "app",
