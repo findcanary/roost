@@ -7,7 +7,7 @@ namespace App\Config;
 use Illuminate\Support\Facades\File;
 use App\Config as ConfigProvider;
 use App\Services\FilePath;
-use App\Services\HomeDirectory;
+use App\Services\Directory;
 
 class Finder
 {
@@ -57,7 +57,7 @@ class Finder
      */
     private function findParentConfig(string $directoryPath): void
     {
-        if (!HomeDirectory::isHomeDirectory($directoryPath) && !HomeDirectory::isRootDirectory($directoryPath)) {
+        if (!Directory::isHomeDirectory($directoryPath) && !Directory::isRootDirectory($directoryPath)) {
             $parentDirectoryPath = File::dirname($directoryPath);
             $parentDirectoryConfig = FilePath::buildPath([$parentDirectoryPath, ConfigProvider::FILENAME]);
             if (File::isFile($parentDirectoryConfig)) {
@@ -73,7 +73,7 @@ class Finder
      */
     private function findHomeConfig(): void
     {
-        $homeConfig = FilePath::buildPath([HomeDirectory::getHomeDirectory(), ConfigProvider::FILENAME]);
+        $homeConfig = FilePath::buildPath([Directory::getHomeDirectory(), ConfigProvider::FILENAME]);
         if (File::isFile($homeConfig)) {
             $this->globalFiles[] = $homeConfig;
         }

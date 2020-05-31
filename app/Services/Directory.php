@@ -4,9 +4,10 @@ declare(strict_types = 1);
 
 namespace App\Services;
 
+use App\Facades\AppConfig;
 use Illuminate\Support\Facades\File;
 
-class HomeDirectory
+class Directory
 {
     /**
      * @param string $directoryPath
@@ -43,5 +44,13 @@ class HomeDirectory
         $rootDir = $pathInPieces[0] ?? __DIR__;
         $rootDir = rtrim($rootDir, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR;
         return $rootDir;
+    }
+
+    /**
+     * @return string
+     */
+    public static function getTmpDirectory(): string
+    {
+        return AppConfig::getConfigValue('tmp') ?: env('TMPDIR');
     }
 }

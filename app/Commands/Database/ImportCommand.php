@@ -12,6 +12,7 @@ use App\Services\Database;
 use App\Services\Dump;
 use App\Services\DumpFile;
 use App\Services\Progress;
+use App\Services\Directory;
 use App\Services\Pdo;
 use App\Shell\Pipe;
 use App\Shell\Command\Pv;
@@ -75,7 +76,7 @@ class ImportCommand extends Command
 
         Pdo::validateConfiguration();
 
-        $tmpFilePath = tempnam(env('TMPDIR'), 'dbtoolbox_');
+        $tmpFilePath = tempnam(Directory::getTmpDirectory(), 'dbtoolbox_');
         $pipeUnarchive = new Pipe();
         $isUnarchive = Archive::addUnarchiveCommand($dbPath, $pipeUnarchive);
         if ($isUnarchive) {

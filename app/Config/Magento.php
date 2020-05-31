@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\File;
 use App\Config;
 use App\Services\DsnParts;
 use App\Services\FilePath;
-use App\Services\HomeDirectory;
+use App\Services\Directory;
 
 class Magento
 {
@@ -119,8 +119,8 @@ class Magento
         $isFileExists = File::isFile($envFilePath);
 
         if (!$isFileExists
-            && !HomeDirectory::isHomeDirectory($directoryPath)
-            && !HomeDirectory::isRootDirectory($directoryPath)
+            && !Directory::isHomeDirectory($directoryPath)
+            && !Directory::isRootDirectory($directoryPath)
         ) {
             return $this->getMagentoConfig(File::dirname($directoryPath));
         }

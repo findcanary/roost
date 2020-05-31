@@ -42,7 +42,7 @@ class Dump
         if (strpos($file, DIRECTORY_SEPARATOR) === 0) {
             $dbPath = $file;
         } elseif (strpos($file, '~') === 0) {
-            $dbPath = str_replace('~', HomeDirectory::getHomeDirectory(), $file);
+            $dbPath = str_replace('~', Directory::getHomeDirectory(), $file);
         } elseif (strpos($file, '.' . DIRECTORY_SEPARATOR) === 0) {
             $dbPath = getcwd() . DIRECTORY_SEPARATOR . substr($file, 2);
         } else {
@@ -59,7 +59,7 @@ class Dump
     {
         $dumpDir = AppConfig::getConfigValue(Config::KEY_STORAGE);
         $dumpDir = !empty($dumpDir) ? $dumpDir : getcwd();
-        $dumpDir = str_replace('~', HomeDirectory::getHomeDirectory(), $dumpDir);
+        $dumpDir = str_replace('~', Directory::getHomeDirectory(), $dumpDir);
 
         File::ensureDirectoryExists($dumpDir);
         $dumpDir = realpath($dumpDir);

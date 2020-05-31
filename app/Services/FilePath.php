@@ -26,7 +26,7 @@ class FilePath
         } elseif (strpos($path, DIRECTORY_SEPARATOR) === 0) {
             $currentPath = $path;
         } elseif (strpos($path, '~') === 0) {
-            $currentPath = str_replace('~', HomeDirectory::getHomeDirectory(), $path);
+            $currentPath = str_replace('~', Directory::getHomeDirectory(), $path);
         } else {
             $currentPath = getcwd() . DIRECTORY_SEPARATOR . ltrim($path, DIRECTORY_SEPARATOR);
         }
