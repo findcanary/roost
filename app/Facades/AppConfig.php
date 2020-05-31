@@ -11,7 +11,7 @@ use Symfony\Component\Console\Input\InputInterface;
  * @method static array|string|null getConfigValue(string $configKey)
  * @method static string|null setConfigValue(string $configKey, string $configValue):
  * @method static array toConfigArray()
- * @method static void initializeConfig(InputInterface $input)
+ * @method static void ensureAppConfigInitialized(InputInterface $input)
  *
  * @see \App\Config
  */

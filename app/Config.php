@@ -79,12 +79,23 @@ class Config
      * @param \Symfony\Component\Console\Input\InputInterface $input
      * @return void
      */
-    public function initializeConfig(InputInterface $input): void
+    public function ensureAppConfigInitialized(InputInterface $input): void
+    {
+        if ($this->config === null) {
+            $this->config = $this->initializeConfig($input);
+        }
+    }
+
+    /**
+     * @param \Symfony\Component\Console\Input\InputInterface $input
+     * @return array
+     */
+    private function initializeConfig(InputInterface $input): array
     {
         $workingDirectory = FilePath::getCurrentPath($input->getOption(self::OPTION_MAGENTO_DIR));
         $configParser = new Parser($workingDirectory);
         $configData = $configParser->toConfigArray();
-        $this->config = $this->applyInputConfig($configData, $input);
+        return $this->applyInputConfig($configData, $input);
     }
 
     /**
