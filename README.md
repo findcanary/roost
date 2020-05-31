@@ -8,11 +8,11 @@ Main features:
 * create/drop databases
 * import databases
   * supported `*.sql`, `*.sql.gz` and `*.sql.zip` dump files
-  * db dumps can be filtered on DEFINERs (including for procedures and functions) and ROW_FORMAT
+  * db dumps can be filtered on DEFINERs (including procedures and functions) and ROW_FORMAT
 * export databases
   * supported `*.sql` and `*.sql.gz` dump files
-  * db dumps always are exported procedures and functions
-  * db dumps can be filtered on DEFINERs (including for procedures and functions) and ROW_FORMAT
+  * db dumps always exports procedures and functions
+  * db dumps can be filtered on DEFINERs (including procedures and functions) and ROW_FORMAT
   * db dumps can be [stripped](https://github.com/netz98/n98-magerun/wiki/Stripped-Database-Dumps)
 * local DB dump storage folder
   * DB is exported to the storage by default
@@ -28,7 +28,7 @@ Main features:
 ## Requirements
 
 * PHP 7.2.5+ (with permission to run `exec` and `passthru`)
-* PHP extensions: posix, fileinfo, pdo
+* PHP extensions: posix, simplexml, zlib, fileinfo, json, pdo, pcre
 * `mysql` client on the `$PATH`
 * `pv` optional (run `brew install pv` on macOS)
 
@@ -67,9 +67,9 @@ The configuration can either be provided through configuration files (file name 
     db-name: MySQL DB name
     project: Project key
     storage: Local path where DB dumps are located
-    table-groups: Table groups for stripping dtabases during exporting
+    table-groups: Table groups for stripping databases during exporting
 
-The configuration is searched in various places then merged, if config keys found in more than one file they are overwritten. 
+The configuration is searched in various places then merged, if config keys found in more than one file they are overwritten.
 Here are places and priorities for the configuration (from lowest to highest):
 
 * **Internal**: `config/config.yml` the configuration contains the default `table-groups` for stripping M2 databases during export
