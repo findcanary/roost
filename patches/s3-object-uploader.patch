@@ -10,7 +10,7 @@
  class ObjectUploader implements PromisorInterface
  {
 -    const DEFAULT_MULTIPART_THRESHOLD = 16777216;
-+    const DEFAULT_MULTIPART_THRESHOLD = 1073741824;
++    const DEFAULT_MULTIPART_THRESHOLD = 107374182400;
 
      private $client;
      private $bucket;
@@ -19,7 +19,7 @@
          'mup_threshold' => self::DEFAULT_MULTIPART_THRESHOLD,
          'params'        => [],
 -        'part_size'     => null,
-+        'part_size'     => 1073741824,
++        'part_size'     => 107374182400,
      ];
 
      /**
@@ -31,7 +31,7 @@
          $this->mupThreshold = isset($options['mup_threshold'])
              ? $options['mup_threshold']
 -            : 16777216;
-+            : 1073741824;
++            : 107374182400;
          if ($this->mupThreshold < MultipartUploader::PART_MIN_SIZE) {
              throw new \InvalidArgumentException('mup_threshold must be >= 5MB');
          }
