@@ -76,7 +76,7 @@ class ImportCommand extends Command
 
         Pdo::validateConfiguration();
 
-        $tmpFilePath = tempnam(Directory::getTmpDirectory(), 'dbtoolbox_');
+        $tmpFilePath = tempnam(Directory::getTmpDirectory(), 'roost_');
         $pipeUnarchive = new Pipe();
         $isUnarchive = Archive::addUnarchiveCommand($dbPath, $pipeUnarchive);
         if ($isUnarchive) {
