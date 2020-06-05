@@ -80,7 +80,8 @@ class RestoreCommand extends Command
 
     private function getMostRecentDump(string $project, ?string $tag = null): ?string
     {
-        AwsS3::initAwsBucket($this->output);
+        $initProgress = !$this->option('no-progress') && !$this->option('quiet');
+        AwsS3::initAwsBucket($this->output, $initProgress);
 
         $dumpItems = AwsS3::getAwsProjectDumps($project, $tag);
         $dumpItems = array_reverse($dumpItems);
