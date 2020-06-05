@@ -17,6 +17,7 @@ use App\Services\Pdo;
 use App\Shell\Pipe;
 use App\Shell\Command\Pv;
 use App\Commands\Dump\UploadCommand;
+use Illuminate\Support\Facades\File;
 
 class ExportCommand extends Command
 {
@@ -35,7 +36,8 @@ class ExportCommand extends Command
         . ' {--no-progress : Do not display progress}'
         . ' {--print : Print command only, not run it}'
         . ' {--skip-filter : Do not filter DEFINER and ROW_FORMAT}'
-        . ' {--u|upload : Upload the dump to AWS S3}';
+        . ' {--u|upload : Upload the dump to AWS S3}'
+        . ' {--r|remove-file : Remove file after upload}';
 
     /**
      * @var string
@@ -146,6 +148,8 @@ class ExportCommand extends Command
                     '--quiet' => $this->option('quiet'),
                 ]
             );
+
+            $this->processDeletingFile($dumpPath);
         }
     }
 
@@ -184,5 +188,18 @@ class ExportCommand extends Command
     private function updateDumpExtension(string $file): string
     {
         return DumpFile::isOutcomeFileSupported($file) ? $file : $file . '.sql.gz';
+    }
+
+    /**
+     * @param string $dumpPath
+     * @return void
+     */
+    private function processDeletingFile(string $dumpPath): void
+    {
+        if (!$this->option('remove-file')) {
+            return;
+        }
+
+        File::delete($dumpPath);
     }
 }

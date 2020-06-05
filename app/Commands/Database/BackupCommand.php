@@ -25,7 +25,8 @@ class BackupCommand extends Command
         . ' {--print : Print command only, not run it}'
         . ' {--skip-filter : Do not filter DEFINER and ROW_FORMAT}'
         . ' {--c|clean= : The number of latest dumps to keep, other will be removed}'
-        . ' {--f|force : Overwrite dump file if it already exits locally}';
+        . ' {--f|force : Overwrite dump file if it already exits locally}'
+        . ' {--k|keep-file : Keep dump file}';
 
     /**
      * @var string
@@ -61,6 +62,7 @@ class BackupCommand extends Command
                 '--force' => $this->option('force'),
                 '--quiet' => $this->option('quiet'),
                 '--upload' => true,
+                '--remove-file' => !$this->option('keep-file')
             ]
         );
 
