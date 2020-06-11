@@ -42,6 +42,11 @@ class Parser
 
         $config = array_replace_recursive($config, $this->magentoConfig->toConfigArray());
 
+        $magentoConfigFile = $this->configFinder->getCurrentFile($this->magentoConfig->getMagentoDirectory());
+        if ($magentoConfigFile) {
+            $config = array_replace_recursive($config, Yaml::parseFile($magentoConfigFile));
+        }
+
         $currentConfigFile = $this->configFinder->getCurrentFile();
         if ($currentConfigFile) {
             $config = array_replace_recursive($config, Yaml::parseFile($currentConfigFile));

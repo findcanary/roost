@@ -30,11 +30,13 @@ class Finder
     }
 
     /**
+     * @param string|null $currentDirectory
      * @return string
      */
-    public function getCurrentFile(): ?string
+    public function getCurrentFile(string $currentDirectory = null): ?string
     {
-        $currentConfigFile = FilePath::buildPath([$this->workingDirectory, ConfigProvider::FILENAME]);
+        $directory = $currentDirectory ?: $this->workingDirectory;
+        $currentConfigFile = FilePath::buildPath([$directory, ConfigProvider::FILENAME]);
         return File::isFile($currentConfigFile) ? $currentConfigFile : null;
     }
 

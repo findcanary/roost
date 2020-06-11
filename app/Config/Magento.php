@@ -18,11 +18,27 @@ class Magento
     private $workingDirectory;
 
     /**
+     * @var string|null
+     */
+    private $magentoDirectory;
+
+    /**
      * @param string $workingDirectory
      */
     public function __construct(string $workingDirectory)
     {
         $this->workingDirectory = $workingDirectory;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getMagentoDirectory(): ?string
+    {
+        if (!$this->magentoDirectory) {
+            $this->fetchEnvConfig();
+        }
+        return $this->magentoDirectory;
     }
 
     /**
@@ -124,6 +140,8 @@ class Magento
         ) {
             return $this->getMagentoConfig(File::dirname($directoryPath));
         }
+
+        $this->magentoDirectory = $isFileExists ? $directoryPath : null;
 
         return $isFileExists ? $envFilePath : null;
     }
