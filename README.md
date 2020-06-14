@@ -67,6 +67,7 @@ The configuration can either be provided through configuration files (file name 
     db-name: MySQL DB name
     project: Project key
     storage: Local path where DB dumps are located
+    magento-directory: Default magento root directory
     table-groups: Table groups for stripping databases during exporting
 
 The configuration is searched in various places then merged, if config keys found in more than one file they are overwritten.
