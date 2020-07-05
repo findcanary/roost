@@ -102,7 +102,7 @@ class ImportCommand extends Command
 
         if (!$this->option('no-progress') && !$this->option('quiet') && Progress::isPvAvailable()) {
             $pipe->command(
-                (new Pv)->arguments([$dbPath, '-w', '80', '-N', 'Export'])
+                (new Pv)->arguments([$dbPath, '-w', '80', '-N', 'Import'])
             );
         } else {
             $pipe->command(
