@@ -23,7 +23,7 @@ class Directory
      */
     public static function getHomeDirectory(): ?string
     {
-        return env('HOME') ?: (env('HOMEDRIVE') . env('HOMEPATH'));
+        return env('HOME') ?: '/';
     }
 
     /**
@@ -51,6 +51,7 @@ class Directory
      */
     public static function getTmpDirectory(): string
     {
-        return AppConfig::getConfigValue('tmp') ?: env('TMPDIR');
+        $tmpDirectory = AppConfig::getConfigValue('tmp') ?: env('TMPDIR');
+        return $tmpDirectory ?: getcwd();
     }
 }
