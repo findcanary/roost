@@ -24,6 +24,7 @@ class BackupCommand extends Command
         . ' {--no-progress : Do not display progress}'
         . ' {--print : Print command only, not run it}'
         . ' {--skip-filter : Do not filter DEFINER and ROW_FORMAT}'
+        . ' {--compatibility : mysqldump 8 backward compatible with MySQL 5.7}'
         . ' {--c|clean= : The number of latest dumps to keep, other will be removed}'
         . ' {--f|force : Overwrite dump file if it already exits locally}'
         . ' {--k|keep-file : Keep dump file}';
@@ -55,6 +56,7 @@ class BackupCommand extends Command
                 '--aws-region' => $this->option('aws-region'),
                 '--tag' => $this->option('tag'),
                 '--strip' => $this->option('strip'),
+                '--compatibility' => $this->option('compatibility'),
                 '--no-progress' => $this->option('no-progress'),
                 '--print' => $this->option('print'),
                 '--skip-filter' => $this->option('skip-filter'),

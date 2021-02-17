@@ -33,6 +33,7 @@ class ExportCommand extends Command
         . ' {--t|tag= : A tag of the dump file}'
         . ' {--f|force : Overwrite dump file if it already exits locally}'
         . ' {--s|strip= : Tables to strip (dump only structure of those tables)}'
+        . ' {--compatibility : mysqldump 8 backward compatibility with MySQL 5.7}'
         . ' {--no-progress : Do not display progress}'
         . ' {--print : Print command only, not run it}'
         . ' {--skip-filter : Do not filter DEFINER and ROW_FORMAT}'
@@ -70,17 +71,23 @@ class ExportCommand extends Command
         $strip = (string)$this->option('strip');
         $stripTableList = !empty($strip) ? DbStrip::getTableList($strip, Database::getAllTables($dbName)) : [];
         if (!empty($stripTableList)) {
+            $mysqldumpCommand = Database::createMysqldumpCommand();
+            $mysqldumpCommand->arguments([
+                '--default-character-set=utf8',
+                '--add-drop-table',
+                '--no-data',
+                $dbName
+            ]);
+            $mysqldumpCommand->arguments($stripTableList);
+
+            if ($this->option('compatibility')) {
+                $mysqldumpCommand->arguments([
+                    '--set-gtid-purged=OFF'
+                ]);
+            }
+
             $structurePipe = new Pipe();
-            $structurePipe->command(
-                Database::createMysqldumpCommand()
-                    ->arguments([
-                        '--default-character-set=utf8',
-                        '--add-drop-table',
-                        '--no-data',
-                        $dbName
-                    ])
-                    ->arguments($stripTableList)
-            );
+            $structurePipe->command($mysqldumpCommand);
 
             if (!$this->option('skip-filter')) {
                 $structurePipe->commands(Database::getFilterCommands());
@@ -97,15 +104,21 @@ class ExportCommand extends Command
             }
         }
 
+        $mysqldumpCommand = Database::createMysqldumpCommand();
+        $mysqldumpCommand->arguments([
+            '--routines=true',
+            '--add-drop-table',
+            '--default-character-set=utf8',
+            $dbName
+        ]);
+        if ($this->option('compatibility')) {
+            $mysqldumpCommand->arguments([
+                '--set-gtid-purged=OFF'
+            ]);
+        }
+
         $pipe = new Pipe();
-        $pipe->command(
-            Database::createMysqldumpCommand()->arguments([
-                '--routines=true',
-                '--add-drop-table',
-                '--default-character-set=utf8',
-                $dbName
-            ])
-        );
+        $pipe->command($mysqldumpCommand);
 
         if (!empty($stripTableList)) {
             $stripTableArguments = array_map(static function ($table) use ($dbName) {
