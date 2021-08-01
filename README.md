@@ -2,7 +2,7 @@
 # Roost - Database Backup Manager
 
 Roost is a database backup manager designed to simplify the process of taking backups from one environment and moving them to another. 
-It was developed for Magento 2, however can be used it as well.
+It was developed for Magento 2, however can be used without it as well.
 
 Main features:
 * create/drop databases
@@ -27,7 +27,7 @@ Main features:
 
 ## Requirements
 
-* PHP 7.2.5+ (with permission to run `exec` and `passthru`)
+* PHP 7.3+ (with permission to run `exec` and `passthru`)
 * PHP extensions: posix, simplexml, zlib, fileinfo, json, pdo, pcre
 * `mysql` client on the `$PATH`
 * `pv` optional (run `brew install pv` on macOS)
