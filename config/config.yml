@@ -6,7 +6,11 @@ menu-background-colour: 'black'
 table-groups:
   - id: admin
     description: Admin tables
-    tables: admin* magento_logging_event magento_logging_event_changes
+    tables: admin* magento_logging_event magento_logging_event_changes ui_bookmark authorization_role authorization_rule
+
+  - id: oauth
+    description: OAuth tables
+    tables: oauth_*
 
   - id: log
     description: Log tables
@@ -18,7 +22,7 @@ table-groups:
 
   - id: stripped
     description: Standard definition for a stripped dump (logs, sessions, dotmailer)
-    tables: "@log @sessions @dotmailer @newrelic_reporting"
+    tables: "@log @sessions @dotmailer @newrelic_reporting @temp"
 
   - id: sales
     description: Sales data (orders, invoices, creditmemos etc)
@@ -43,6 +47,7 @@ table-groups:
         sales_creditmemo_*
       sales_recurring_* sales_refunded_* sales_payment_*
       enterprise_sales_* enterprise_customer_sales_* sales_bestsellers_* magento_customercustomattributes_sales_flat_*
+      inventory_reservation
       paypal_billing_agreement*
       paypal_payment_transaction
       paypal_settlement_report*
@@ -51,7 +56,7 @@ table-groups:
 
   - id: quotes
     description: Cart (quote) data
-    tables: quote quote_*
+    tables: negotiable_quote negotiable_quote_* quote quote_*
 
   - id: customers
     description: Customer data - Should not be used without @sales
@@ -77,11 +82,11 @@ table-groups:
 
   - id: trade
     description: Current trade data (customers and orders). You usally do not want those in developer systems.
-    tables: "@customers @sales @quotes"
+    tables: "@customers @sales @quotes @klarna @mailchimp"
 
   - id: development
     description: Removes logs and trade data so developers do not have to work with real customer data
-    tables: "@admin @trade @stripped @search @2fa @aggregated"
+    tables: "@admin @oauth @trade @stripped @search @2fa @aggregated"
 
   - id: ee_changelog
     description: Changelog tables of new indexer since EE 1.13
@@ -100,7 +105,20 @@ table-groups:
 
   - id: dotmailer
     description: Dotmailer tables
-    tables: email_abandoned_cart email_automation email_campaign email_contact
+    tables: >
+      email_abandoned_cart
+      email_automation
+      email_campaign
+      email_catalog
+      email_contact
+      email_contact_consent
+      email_coupon_attribute
+      email_failed_auth
+      email_importer
+      email_order
+      email_review
+      email_rules
+      email_wishlist
 
   - id: 2fa
     description: Two Factor Auth tables
@@ -126,3 +144,15 @@ table-groups:
   - id: replica
     description: Replica tables
     tables: "*_replica"
+
+  - id: klarna
+    description: Klarna tables
+    tables: "klarna_*"
+
+  - id: temp
+    description: Temporary indexer tables
+    tables: "*__temp*"
+
+  - id: mailchimp
+    description: Mailchimp tables
+    tables: "mailchimp_*"
