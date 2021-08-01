@@ -11,7 +11,7 @@ class DumpFile
     /**
      * @var array
      */
-    private static $supportedIncomeFiles = ['gz', 'zip', 'sql'];
+    private static $supportedIncomeFiles = ['gz', 'zip', 'sql', 'dump'];
 
     /**
      * @var array
