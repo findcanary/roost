@@ -38,7 +38,7 @@ _roost()
             ;;
 
             db:backup)
-            opts="${opts} --tag --strip --no-progress --print --skip-filter --clean --force --keep-file --magento-directory --project --db-host --db-port --db-name --db-username --db-password --storage --aws-bucket --aws-access-key --aws-secret-key --aws-region"
+            opts="${opts} --tag --strip --no-progress --print --skip-filter --compatibility --clean --force --keep-file --magento-directory --project --db-host --db-port --db-name --db-username --db-password --storage --aws-bucket --aws-access-key --aws-secret-key --aws-region"
             ;;
 
             db:create)
@@ -50,7 +50,7 @@ _roost()
             ;;
 
             db:export)
-            opts="${opts} --tag --force --strip --no-progress --print --skip-filter --upload --remove-file --magento-directory --project --db-host --db-port --db-name --db-username --db-password --storage --aws-bucket --aws-access-key --aws-secret-key --aws-region"
+            opts="${opts} --tag --force --strip --compatibility --no-progress --print --skip-filter --upload --remove-file --magento-directory --project --db-host --db-port --db-name --db-username --db-password --storage --aws-bucket --aws-access-key --aws-secret-key --aws-region"
             ;;
 
             db:import)
