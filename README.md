@@ -37,19 +37,19 @@ Main features:
 
 Download the latest release into and make it executable:
 
-    curl -L https://github.com/ytorbyk/roost/releases/latest/download/roost.phar > /usr/local/bin/roost
+    curl -L https://github.com/findcanary/roost/releases/latest/download/roost.phar > /usr/local/bin/roost
     chmod +x /usr/local/bin/roost
 
 Optionally install autocomplete for all commands:
 
     # BASH - Ubuntu / Debian
-    curl -L https://raw.githubusercontent.com/ytorbyk/roost/master/roost.completion | sudo tee /etc/bash_completion.d/roost
+    curl -L https://raw.githubusercontent.com/findcanary/roost/master/roost.completion | sudo tee /etc/bash_completion.d/roost
 
     # BASH - Mac OSX (with Homebrew "bash-completion")
-    curl -L https://raw.githubusercontent.com/ytorbyk/roost/master/roost.completion > $(brew --prefix)/etc/bash_completion.d/roost
+    curl -L https://raw.githubusercontent.com/findcanary/roost/master/roost.completion > $(brew --prefix)/etc/bash_completion.d/roost
 
     # ZSH - Config file
-    curl -L https://raw.githubusercontent.com/ytorbyk/roost/master/roost.completion > ~/.roost_completion && echo "source ~/.roost_completion" >> ~/.zshrc
+    curl -L https://raw.githubusercontent.com/findcanary/roost/master/roost.completion > ~/.roost_completion && echo "source ~/.roost_completion" >> ~/.zshrc
 
 
 ## Configuration
