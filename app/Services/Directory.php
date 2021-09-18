@@ -51,7 +51,7 @@ class Directory
      */
     public static function getTmpDirectory(): string
     {
-        $tmpDirectory = AppConfig::getConfigValue('tmp') ?: env('TMPDIR');
+        $tmpDirectory = AppConfig::getConfigValue(\App\Config::KEY_TMP_DIR) ?: env('TMPDIR');
         return $tmpDirectory ?: getcwd();
     }
 }

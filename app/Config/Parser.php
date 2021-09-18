@@ -21,6 +21,23 @@ class Parser
     private $magentoConfig;
 
     /**
+     * @var array
+     */
+    private $envVariableMap = [
+        AppConfig::KEY_AWS_REGION => 'ROOST_AWS_REGION',
+        AppConfig::KEY_AWS_BUCKET => 'ROOST_AWS_BUCKET',
+        AppConfig::KEY_AWS_ACCESS_KEY => 'ROOST_AWS_ACCESS_KEY',
+        AppConfig::KEY_AWS_SECRET_KEY => 'ROOST_AWS_SECRET_KEY',
+        AppConfig::KEY_DB_HOST => 'ROOST_MYSQL_HOST',
+        AppConfig::KEY_DB_PORT => 'ROOST_MYSQL_PORT',
+        AppConfig::KEY_DB_NAME => 'ROOST_MYSQL_DB',
+        AppConfig::KEY_DB_USERNAME => 'ROOST_MYSQL_USER',
+        AppConfig::KEY_DB_PASSWORD => 'ROOST_MYSQL_PWD',
+        AppConfig::KEY_STORAGE => 'ROOST_STORAGE',
+        AppConfig::KEY_TMP_DIR => 'ROOST_TMP_DER'
+    ];
+
+    /**
      * @param string $workingDirectory
      */
     public function __construct(string $workingDirectory)
@@ -36,6 +53,7 @@ class Parser
     {
         $config = Yaml::parseFile(__DIR__ . '/../../config/config.yml');
 
+        $config = $this->readEnvVariables($config);
         $config = $this->applyConfigFiles($config);
         $config = $this->applyMagentoConfig($config);
         $config = $this->applyMagentoConfigFile($config);
@@ -55,6 +73,16 @@ class Parser
         }
 
         return $config;
+    }
+
+    /**
+     * @param array $config
+     * @return array
+     */
+    private function readEnvVariables(array $config): array
+    {
+        $values = array_filter(array_map('env', $this->envVariableMap));
+        return array_merge($config, $values);
     }
 
     /**

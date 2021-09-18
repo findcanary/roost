@@ -16,6 +16,7 @@ class Config
 
     const KEY_PROJECT = 'project';
     const KEY_STORAGE = 'storage';
+    const KEY_TMP_DIR = 'tmp';
 
     const KEY_DB_HOST = 'db-host';
     const KEY_DB_PORT = 'db-port';
