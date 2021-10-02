@@ -10,6 +10,7 @@ use App\Facades\AppConfig;
 use App\Services\AwsS3;
 use App\Services\Dump;
 use App\Commands\Database\ImportCommand;
+use App\Commands\Warden\ImportCommand as WardenImportCommand;
 
 class DownloadCommand extends Command
 {
@@ -23,6 +24,7 @@ class DownloadCommand extends Command
     protected $signature = self::COMMAND
         . ' {dump? : Dump file name}'
         . ' {--i|import : Import downloaded dump}'
+        . ' {--w|import-warden : Import downloaded dump into Warden Db container}'
         . ' {--r|remove-file : Remove file after import}'
         . ' {--no-progress : Do not display progress}'
         . ' {--f|force : Overwrite local file if exits without confirmation}';
@@ -83,6 +85,19 @@ class DownloadCommand extends Command
 
             $this->call(
                 ImportCommand::COMMAND,
+                [
+                    'file' => $dbFile,
+                    '--no-progress' => $this->option('no-progress'),
+                    '--quiet' => $this->option('quiet'),
+                ]
+            );
+
+            $this->processDeletingFile($dbFile);
+        } elseif ($this->option('import-warden')) {
+            $this->info('Import the dump:');
+
+            $this->call(
+                WardenImportCommand::COMMAND,
                 [
                     'file' => $dbFile,
                     '--no-progress' => $this->option('no-progress'),

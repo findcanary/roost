@@ -149,6 +149,16 @@ abstract class Base implements \App\Shell\CommandInterface
     }
 
     /**
+     * @param array|null $output
+     * @param int|null $resultCode
+     * @return string|null
+     */
+    public function exec(array &$output = null, int $resultCode = null): ?string
+    {
+        return exec($this->toString(), $output, $resultCode);
+    }
+
+    /**
      * @return void
      */
     public function passthru(): void

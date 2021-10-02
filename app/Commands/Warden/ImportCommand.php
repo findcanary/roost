@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Commands\Database;
+namespace App\Commands\Warden;
 
 use LaravelZero\Framework\Commands\Command;
 use App\Traits\Command as AppCommand;
@@ -13,7 +13,7 @@ use App\Services\Dump;
 use App\Services\DumpFile;
 use App\Services\Progress;
 use App\Services\Directory;
-use App\Services\Pdo;
+use App\Services\WardenDatabase;
 use App\Shell\Pipe;
 use App\Shell\Command\Pv;
 use App\Shell\Command\Cat;
@@ -23,7 +23,7 @@ class ImportCommand extends Command
 {
     use AppCommand;
 
-    const COMMAND = 'db:import';
+    const COMMAND = 'warden:db:import';
 
     /**
      * @var string
@@ -37,18 +37,14 @@ class ImportCommand extends Command
     /**
      * @var string
      */
-    protected $description = 'Import Database';
+    protected $description = 'Import Database from Warden db container';
 
     /**
      * @return void
      */
     public function handle(): void
     {
-        $dbName = AppConfig::getConfigValue('db-name') ?: $this->ask('Enter Db name');
-        if (!$dbName) {
-            $this->error('DB name is not specified.');
-            return;
-        }
+        $dbName = AppConfig::getConfigValue('db-name');
 
         $fileName = $this->argument('file');
         $fileName = $fileName || $this->option('quiet') ? $fileName : Dump::getDumpName('Import DB');
@@ -73,8 +69,6 @@ class ImportCommand extends Command
         if (!$this->option('print')) {
             $this->call(CreateCommand::COMMAND, ['name' => $dbName, '--force' => true]);
         }
-
-        Pdo::validateConfiguration();
 
         $tmpFilePath = tempnam(Directory::getTmpDirectory(), 'roost_tmp_dump_');
         $pipeUnarchive = new Pipe();
@@ -114,9 +108,7 @@ class ImportCommand extends Command
             $pipe->commands(Database::getFilterCommands());
         }
 
-        $pipe->command(
-            Database::createMysqlCommand()->arguments(['--force', $dbName])
-        );
+        $pipe->command($this->createWardenDbImport($dbName));
 
         if ($this->option('print')) {
             $this->line($pipe->toString());
@@ -137,5 +129,19 @@ class ImportCommand extends Command
     private function verifyPath(string $dbPath): bool
     {
         return File::exists($dbPath) && File::isFile($dbPath);
+    }
+
+    /**
+     * @param string|null $dbName
+     * @return \App\Shell\Command\Warden
+     */
+    private function createWardenDbImport(string $dbName = null): \App\Shell\Command\Warden
+    {
+        $wardenCommand = WardenDatabase::createWardenDbCommand('import');
+        if ($dbName) {
+            $wardenCommand->argument($dbName);
+        }
+        $wardenCommand->argument('--force');
+        return $wardenCommand;
     }
 }

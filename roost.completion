@@ -30,7 +30,7 @@ _roost()
             ;;
 
             list)
-            opts="${opts} --raw --format"
+            opts="${opts} --raw --format --short"
             ;;
 
             config:dump)
@@ -70,7 +70,7 @@ _roost()
             ;;
 
             dump:download)
-            opts="${opts} --import --remove-file --no-progress --force --magento-directory --project --db-host --db-port --db-name --db-username --db-password --storage --aws-bucket --aws-access-key --aws-secret-key --aws-region"
+            opts="${opts} --import --import-warden --remove-file --no-progress --force --magento-directory --project --db-host --db-port --db-name --db-username --db-password --storage --aws-bucket --aws-access-key --aws-secret-key --aws-region"
             ;;
 
             dump:list)
@@ -85,6 +85,34 @@ _roost()
             opts="${opts} --no-progress --force --magento-directory --project --db-host --db-port --db-name --db-username --db-password --storage --aws-bucket --aws-access-key --aws-secret-key --aws-region"
             ;;
 
+            warden:db:backup)
+            opts="${opts} --tag --strip --no-progress --print --skip-filter --compatibility --clean --force --keep-file --magento-directory --project --db-host --db-port --db-name --db-username --db-password --storage --aws-bucket --aws-access-key --aws-secret-key --aws-region"
+            ;;
+
+            warden:db:create)
+            opts="${opts} --force --magento-directory --project --db-host --db-port --db-name --db-username --db-password --storage --aws-bucket --aws-access-key --aws-secret-key --aws-region"
+            ;;
+
+            warden:db:drop)
+            opts="${opts} --magento-directory --project --db-host --db-port --db-name --db-username --db-password --storage --aws-bucket --aws-access-key --aws-secret-key --aws-region"
+            ;;
+
+            warden:db:export)
+            opts="${opts} --tag --force --strip --compatibility --no-progress --print --skip-filter --upload --remove-file --magento-directory --project --db-host --db-port --db-name --db-username --db-password --storage --aws-bucket --aws-access-key --aws-secret-key --aws-region"
+            ;;
+
+            warden:db:import)
+            opts="${opts} --no-progress --print --skip-filter --magento-directory --project --db-host --db-port --db-name --db-username --db-password --storage --aws-bucket --aws-access-key --aws-secret-key --aws-region"
+            ;;
+
+            warden:db:list)
+            opts="${opts} --magento-directory --project --db-host --db-port --db-name --db-username --db-password --storage --aws-bucket --aws-access-key --aws-secret-key --aws-region"
+            ;;
+
+            warden:dump:restore)
+            opts="${opts} --most-recent --tag --no-progress --force --keep-file --magento-directory --project --db-host --db-port --db-name --db-username --db-password --storage --aws-bucket --aws-access-key --aws-secret-key --aws-region"
+            ;;
+
         esac
 
         COMPREPLY=($(compgen -W "${opts}" -- ${cur}))
@@ -95,7 +123,7 @@ _roost()
 
     # completing for a command
     if [[ $cur == $com ]]; then
-        coms="help list config:dump db:backup db:create db:drop db:export db:import db:list dump:clean dump:delete dump:download dump:list dump:restore dump:upload"
+        coms="help list config:dump db:backup db:create db:drop db:export db:import db:list dump:clean dump:delete dump:download dump:list dump:restore dump:upload warden:db:backup warden:db:create warden:db:drop warden:db:export warden:db:import warden:db:list warden:dump:restore"
 
         COMPREPLY=($(compgen -W "${coms}" -- ${cur}))
         __ltrim_colon_completions "$cur"

@@ -2,19 +2,18 @@
 
 declare(strict_types=1);
 
-namespace App\Commands\Database;
+namespace App\Commands\Warden;
 
-use LaravelZero\Framework\Commands\Command;
+use App\Services\WardenDatabase;
 use App\Traits\Command as AppCommand;
-use App\Services\Pdo;
-use App\Services\Database;
+use LaravelZero\Framework\Commands\Command;
 use Symfony\Component\Console\Helper\Table;
 
 class ListCommand extends Command
 {
     use AppCommand;
 
-    const COMMAND = 'db:list';
+    const COMMAND = 'warden:db:list';
 
     /**
      * @var string
@@ -25,7 +24,7 @@ class ListCommand extends Command
     /**
      * @var string
      */
-    protected $description = 'Display DB list';
+    protected $description = 'Display DB list in current project';
 
     /**
      * @return void
@@ -34,9 +33,7 @@ class ListCommand extends Command
     {
         $search = $this->argument('search');
 
-        Pdo::validateConfiguration();
-
-        $dbList = Database::getExistingDatabases();
+        $dbList = WardenDatabase::getExistingDatabases();
         if (!empty($search)) {
             $dbList = array_filter($dbList, static function ($dbName) use ($search) {
                 return strpos($dbName, $search) !== false;
