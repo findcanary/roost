@@ -40,6 +40,16 @@ Download the latest release into and make it executable:
     curl -L https://github.com/findcanary/roost/releases/latest/download/roost.phar > /usr/local/bin/roost
     chmod +x /usr/local/bin/roost
 
+
+Since, currently, there is no system PHP in the latest macOS we need to install PHP via Brew. The latest version of the roost requires PHP >= 8.0.
+In order to be able to run it regardless of which version is linked PHP version, we can do the next:
+  - rename ~/bin/roost to ~/bin/bin-roost
+  - create a text executable bash file with the next content:
+    ```
+    #!/usr/bin/env bash
+    /usr/local/opt/php@8.0/bin/php "$HOME/bin/bin-roost" "$@"
+    ```
+
 Optionally install autocomplete for all commands:
 
     # BASH - Ubuntu / Debian
