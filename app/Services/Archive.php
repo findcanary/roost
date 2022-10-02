@@ -38,7 +38,7 @@ class Archive
         $fileType = File::extension($filename);
         switch ($fileType) {
             case 'gz':
-                $pipe->command((new Gzip)->arguments(['-9', '--force']));
+                $pipe->command((new Gzip())->arguments(['-9', '--force']));
                 $isAdded = true;
                 break;
             case 'sql':
@@ -61,13 +61,13 @@ class Archive
         switch ($fileType) {
             case 'zip':
                 $pipe->command(
-                    (new Unzip)->argument($filePath)
+                    (new Unzip())->argument($filePath)
                 );
                 $isAdded = true;
                 break;
             case 'gz':
                 $pipe->command(
-                    (new Gunzip)->argument($filePath)
+                    (new Gunzip())->argument($filePath)
                 );
                 $isAdded = true;
                 break;

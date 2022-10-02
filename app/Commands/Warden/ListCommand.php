@@ -13,7 +13,7 @@ class ListCommand extends Command
 {
     use AppCommand;
 
-    const COMMAND = 'warden:db:list';
+    public const COMMAND = 'warden:db:list';
 
     /**
      * @var string
@@ -36,7 +36,7 @@ class ListCommand extends Command
         $dbList = WardenDatabase::getExistingDatabases();
         if (!empty($search)) {
             $dbList = array_filter($dbList, static function ($dbName) use ($search) {
-                return strpos($dbName, $search) !== false;
+                return str_contains($dbName, $search);
             });
         }
 

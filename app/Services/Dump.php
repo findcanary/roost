@@ -8,7 +8,7 @@ use App\Config;
 use App\Facades\AppConfig;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Storage;
-use League\Flysystem\Filesystem;
+use Illuminate\Filesystem\FilesystemAdapter;
 
 class Dump
 {
@@ -26,11 +26,15 @@ class Dump
     }
 
     /**
-     * @return \League\Flysystem\Filesystem
+     * @return \Illuminate\Filesystem\FilesystemAdapter
      */
-    public static function getDumpDisk(): Filesystem
+    public static function getDumpFilesystem(): FilesystemAdapter
     {
-        return Storage::disk('dump')->getDriver();
+        $dumpDisk = Storage::disk('dump');
+        if (!$dumpDisk instanceof FilesystemAdapter) {
+            throw new \UnexpectedValueException('Dump disk should be a FilesystemAdapter');
+        }
+        return $dumpDisk;
     }
 
     /**
@@ -39,11 +43,11 @@ class Dump
      */
     public static function getDumpPath(string $file): string
     {
-        if (strpos($file, DIRECTORY_SEPARATOR) === 0) {
+        if (str_starts_with($file, DIRECTORY_SEPARATOR)) {
             $dbPath = $file;
-        } elseif (strpos($file, '~') === 0) {
+        } elseif (str_starts_with($file, '~')) {
             $dbPath = str_replace('~', Directory::getHomeDirectory(), $file);
-        } elseif (strpos($file, '.' . DIRECTORY_SEPARATOR) === 0) {
+        } elseif (str_starts_with($file, '.' . DIRECTORY_SEPARATOR)) {
             $dbPath = getcwd() . DIRECTORY_SEPARATOR . substr($file, 2);
         } else {
             $dbPath = static::getDatabaseDir() . DIRECTORY_SEPARATOR . $file;
@@ -62,8 +66,7 @@ class Dump
         $dumpDir = str_replace('~', Directory::getHomeDirectory(), $dumpDir);
 
         File::ensureDirectoryExists($dumpDir);
-        $dumpDir = realpath($dumpDir);
-        return $dumpDir;
+        return realpath($dumpDir);
     }
 
     /**

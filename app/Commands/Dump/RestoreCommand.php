@@ -13,7 +13,7 @@ class RestoreCommand extends Command
 {
     use AppCommand;
 
-    const COMMAND = 'dump:restore';
+    public const COMMAND = 'dump:restore';
 
     /**
      * @var string

@@ -14,7 +14,7 @@ class RestoreCommand extends Command
 {
     use AppCommand;
 
-    const COMMAND = 'warden:dump:restore';
+    public const COMMAND = 'warden:dump:restore';
 
     /**
      * @var string

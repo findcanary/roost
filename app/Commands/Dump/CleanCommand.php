@@ -13,7 +13,7 @@ class CleanCommand extends Command
 {
     use AppCommand;
 
-    const COMMAND = 'dump:clean';
+    public const COMMAND = 'dump:clean';
 
     /**
      * @var string
@@ -30,7 +30,7 @@ class CleanCommand extends Command
     /**
      * @return void
      *
-     * @throws \League\Flysystem\FileNotFoundException
+     * @throws \League\Flysystem\FilesystemException
      */
     public function handle(): void
     {

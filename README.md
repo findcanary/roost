@@ -7,7 +7,7 @@ It was developed for Magento 2, however can be used without it as well.
 Main features:
 * create/drop databases
 * import databases
-  * supported `*.sql`, `*.sql.gz` and `*.sql.zip` dump files
+  * supported `*.sql`, `*.dump`, `*.sql.gz` and `*.sql.zip` dump files
   * db dumps can be filtered on DEFINERs (including procedures and functions) and ROW_FORMAT
 * export databases
   * supported `*.sql` and `*.sql.gz` dump files
@@ -27,7 +27,7 @@ Main features:
 
 ## Requirements
 
-* PHP 7.3+ (with permission to run `exec` and `passthru`)
+* PHP 8.0+ (with permission to run `exec` and `passthru`)
 * PHP extensions: posix, simplexml, zlib, fileinfo, json, pdo, pcre
 * `mysql` client on the `$PATH`
 * `pv` optional (run `brew install pv` on macOS)
@@ -43,13 +43,13 @@ Download the latest release into and make it executable:
 Optionally install autocomplete for all commands:
 
     # BASH - Ubuntu / Debian
-    curl -L https://raw.githubusercontent.com/findcanary/roost/master/roost.completion | sudo tee /etc/bash_completion.d/roost
+    roost completion | sudo tee /etc/bash_completion.d/roost
 
     # BASH - Mac OSX (with Homebrew "bash-completion")
-    curl -L https://raw.githubusercontent.com/findcanary/roost/master/roost.completion > $(brew --prefix)/etc/bash_completion.d/roost
+    roost completion > $(brew --prefix)/etc/bash_completion.d/roost
 
     # ZSH - Config file
-    curl -L https://raw.githubusercontent.com/findcanary/roost/master/roost.completion > ~/.roost_completion && echo "source ~/.roost_completion" >> ~/.zshrc
+    roost completion > ~/.roost_completion && echo "source ~/.roost_completion" >> ~/.zshrc
 
 
 ## Configuration

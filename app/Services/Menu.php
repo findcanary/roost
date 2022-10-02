@@ -32,7 +32,7 @@ class Menu
                         $addMenuOption($subMenu, $label, $optionSelected);
 
                         $subMenu->addLineBreak('-');
-                        $subMenu->addItem('Go Back', new GoBackAction);
+                        $subMenu->addItem('Go Back', new GoBackAction());
                     });
                 } else {
                     $menuBuilder->addMenuItem(
@@ -46,7 +46,7 @@ class Menu
             }
         };
 
-        $menuBuilder = new CliMenuBuilder;
+        $menuBuilder = new CliMenuBuilder();
         $menuBuilder->setTitle($title);
         $menuBuilder->setWidth(110);
         $menuBuilder->setTitleSeparator('=');

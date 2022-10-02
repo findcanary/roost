@@ -16,7 +16,7 @@ class ListCommand extends Command
 {
     use AppCommand;
 
-    const COMMAND = 'dump:list';
+    public const COMMAND = 'dump:list';
 
     /**
      * @var string
@@ -31,6 +31,7 @@ class ListCommand extends Command
 
     /**
      * @return void
+     * @throws \League\Flysystem\FilesystemException
      */
     public function handle(): void
     {
@@ -41,26 +42,29 @@ class ListCommand extends Command
         $awsDriver = AwsS3::getAwsDisk();
 
         $files = $awsDriver->listContents((string)AppConfig::getConfigValue('project'), true);
-        $files = array_filter($files, static function ($file) {
-            return $file['type'] === 'file';
+        $files = $files->filter(static function (\League\Flysystem\StorageAttributes $file) {
+            return $file->isFile();
         });
 
         if ($search) {
-            $files = array_filter($files, static function ($file) use ($search) {
-                return strpos($file['basename'], $search) !== false;
+            $files = $files->filter(static function (\League\Flysystem\StorageAttributes $file) use ($search) {
+                return str_contains(basename($file->path()), $search);
             });
         }
 
         $tables = [];
         foreach ($files as $file) {
-            if (empty($tables[$file['dirname']])) {
-                $tables[$file['dirname']] = [];
+            $basename = basename($file->path());
+            $dirname = dirname($file->path());
+
+            if (empty($tables[$dirname])) {
+                $tables[$dirname] = [];
             }
 
-            $tables[$file['dirname']][] = [
-                'name' => $file['basename'],
-                'size' => FormattedFileSize::getFormattedFileSize((float)$file['size']),
-                'date' => date('d M Y', $file['timestamp']),
+            $tables[$dirname][] = [
+                'name' => $basename,
+                'size' => FormattedFileSize::getFormattedFileSize((float)$file->fileSize()),
+                'date' => date('d M Y', $file->lastModified()),
             ];
         }
 

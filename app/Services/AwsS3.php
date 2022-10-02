@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Services;
 
-use League\Flysystem\Filesystem;
+use League\Flysystem\FilesystemOperator;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Console\OutputStyle;
 use Symfony\Component\Console\Helper\ProgressBar;
@@ -84,9 +84,9 @@ class AwsS3
     }
 
     /**
-     * @return \League\Flysystem\Filesystem
+     * @return \League\Flysystem\FilesystemOperator
      */
-    public static function getAwsDisk(): Filesystem
+    public static function getAwsDisk(): FilesystemOperator
     {
         return Storage::disk('aws')->getDriver();
     }
@@ -140,17 +140,21 @@ class AwsS3
 
         $dumps = [];
         foreach ($dumpItems as $dumpItem) {
-            if ($dumpItem['type'] === 'dir' && empty($dumps[$dumpItem['basename']])) {
-                $dumps[$dumpItem['basename']] = [];
+            $path = $dumpItem->path();
+            $basename = basename($path);
+            $dirname = dirname($path);
+
+            if (empty($dumps[$basename]) && $dumpItem->isDir()) {
+                $dumps[$basename] = [];
                 continue;
             }
 
-            $dumps[$dumpItem['dirname']][$dumpItem['path']] = [
-                'path' => $dumpItem['path'],
-                'name' => $dumpItem['basename'],
-                'size' => FormattedFileSize::getFormattedFileSize((float)$dumpItem['size']),
-                'date' => date('d M Y', $dumpItem['timestamp']),
-                'timestamp' => $dumpItem['timestamp'],
+            $dumps[$dirname][$path] = [
+                'path' => $path,
+                'name' => $basename,
+                'size' => FormattedFileSize::getFormattedFileSize((float)$dumpItem->fileSize()),
+                'date' => date('d M Y', $dumpItem->lastModified()),
+                'timestamp' => $dumpItem->lastModified(),
             ];
         }
 
@@ -176,7 +180,7 @@ class AwsS3
         if (!empty($tag)) {
             $tag = '[' . $tag . ']';
             $dumpItems = array_filter($dumpItems, static function ($dumpItem) use ($tag) {
-                return strpos($dumpItem['name'], $tag) !== false;
+                return str_contains($dumpItem['name'], $tag);
             });
         }
 

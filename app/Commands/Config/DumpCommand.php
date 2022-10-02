@@ -13,7 +13,7 @@ class DumpCommand extends Command
 {
     use AppCommand;
 
-    const COMMAND = 'config:dump';
+    public const COMMAND = 'config:dump';
 
     /**
      * @var string

@@ -16,7 +16,7 @@ class DownloadCommand extends Command
 {
     use AppCommand;
 
-    const COMMAND = 'dump:download';
+    public const COMMAND = 'dump:download';
 
     /**
      * @var string
@@ -37,8 +37,7 @@ class DownloadCommand extends Command
     /**
      * @return void
      *
-     * @throws \League\Flysystem\FileExistsException
-     * @throws \League\Flysystem\FileNotFoundException
+     * @throws \League\Flysystem\FilesystemException
      * @throws \PhpSchool\CliMenu\Exception\InvalidTerminalException
      */
     public function handle(): void
@@ -69,14 +68,14 @@ class DownloadCommand extends Command
         $dbFile = basename($dumpFile);
 
         // Download the dump
-        $dumpDisk = Dump::getDumpDisk();
-        if (!$dumpDisk->has($dbFile)
+        $dumpFilesystem = Dump::getDumpFilesystem();
+        if (!$dumpFilesystem->has($dbFile)
             || $this->option('force')
             || $this->confirm(sprintf('<comment>%s</comment> dump already exists locally. Overwrite it?', $dbFile), true)
         ) {
             $this->info(sprintf('Downloading <comment>%s</comment>', $dumpFile));
-            $dumpDisk->write($dbFile, $awsDisk->readStream($dumpFile));
-            $this->info(sprintf('Downloaded: <comment>%s</comment>', $dumpDisk->getAdapter()->applyPathPrefix($dbFile)));
+            $dumpFilesystem->writeStream($dbFile, $awsDisk->readStream($dumpFile));
+            $this->info(sprintf('Downloaded: <comment>%s</comment>', $dumpFilesystem->path($dbFile)));
         }
 
         // Import the dump
@@ -112,8 +111,6 @@ class DownloadCommand extends Command
     /**
      * @param string $dbFile
      * @return void
-     *
-     * @throws \League\Flysystem\FileNotFoundException
      */
     private function processDeletingFile(string $dbFile): void
     {
@@ -121,7 +118,7 @@ class DownloadCommand extends Command
             return;
         }
 
-        $dbDisk = Dump::getDumpDisk();
-        $dbDisk->delete($dbFile);
+        $dumpFilesystem = Dump::getDumpFilesystem();
+        $dumpFilesystem->delete($dbFile);
     }
 }

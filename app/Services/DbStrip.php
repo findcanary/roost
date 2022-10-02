@@ -67,7 +67,7 @@ class DbStrip
      */
     private static function looksLikeTableDefinition($string): bool
     {
-        return 0 === strpos($string, '@');
+        return str_starts_with($string, '@');
     }
 
     /**
@@ -76,14 +76,14 @@ class DbStrip
      */
     private static function containsTableDefinition($string): bool
     {
-        return strpos($string, '@') !== false;
+        return str_contains($string, '@');
     }
 
     /**
      * @param $string
      * @return \App\Config\TableGroup|null
      */
-    private static function getTableDefinition($string): ?\App\Config\TableGroup
+    private static function getTableDefinition($string): ?TableGroup
     {
         $tableGroupId = substr($string, 1);
 

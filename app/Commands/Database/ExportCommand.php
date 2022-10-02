@@ -23,7 +23,7 @@ class ExportCommand extends Command
 {
     use AppCommand;
 
-    const COMMAND = 'db:export';
+    public const COMMAND = 'db:export';
 
     /**
      * @var string
@@ -129,7 +129,7 @@ class ExportCommand extends Command
 
         if (!$this->option('no-progress') && !$this->option('quiet') && Progress::isPvAvailable()) {
             $pipe->command(
-                (new Pv)->arguments(['-b', '-t', '-w', '80', '-N', 'Export'])
+                (new Pv())->arguments(['-b', '-t', '-w', '80', '-N', 'Export'])
             );
         }
 

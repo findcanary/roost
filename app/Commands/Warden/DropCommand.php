@@ -12,7 +12,7 @@ class DropCommand extends Command
 {
     use AppCommand;
 
-    const COMMAND = 'warden:db:drop';
+    public const COMMAND = 'warden:db:drop';
 
     /**
      * @var string

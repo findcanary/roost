@@ -23,7 +23,7 @@ class ImportCommand extends Command
 {
     use AppCommand;
 
-    const COMMAND = 'warden:db:import';
+    public const COMMAND = 'warden:db:import';
 
     /**
      * @var string
@@ -77,7 +77,7 @@ class ImportCommand extends Command
 
             if (!$this->option('no-progress') && !$this->option('quiet') && Progress::isPvAvailable()) {
                 $pipeUnarchive->command(
-                    (new Pv)->arguments(['-b', '-t', '-w', '80', '-N', 'Unpack'])
+                    (new Pv())->arguments(['-b', '-t', '-w', '80', '-N', 'Unpack'])
                 );
             }
 
@@ -96,11 +96,11 @@ class ImportCommand extends Command
 
         if (!$this->option('no-progress') && !$this->option('quiet') && Progress::isPvAvailable()) {
             $pipe->command(
-                (new Pv)->arguments([$dbPath, '-w', '80', '-N', 'Import'])
+                (new Pv())->arguments([$dbPath, '-w', '80', '-N', 'Import'])
             );
         } else {
             $pipe->command(
-                (new Cat)->argument($dbPath)
+                (new Cat())->argument($dbPath)
             );
         }
 

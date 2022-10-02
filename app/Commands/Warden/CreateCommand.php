@@ -12,7 +12,7 @@ class CreateCommand extends Command
 {
     use AppCommand;
 
-    const COMMAND = 'warden:db:create';
+    public const COMMAND = 'warden:db:create';
 
     /**
      * @var string

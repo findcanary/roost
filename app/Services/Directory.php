@@ -19,7 +19,7 @@ class Directory
     }
 
     /**
-     * @return string
+     * @return string|null
      */
     public static function getHomeDirectory(): ?string
     {

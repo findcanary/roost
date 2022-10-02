@@ -15,7 +15,7 @@ class UploadCommand extends Command
 {
     use AppCommand;
 
-    const COMMAND = 'dump:upload';
+    public const COMMAND = 'dump:upload';
 
     /**
      * @var string
@@ -33,7 +33,7 @@ class UploadCommand extends Command
     /**
      * @return void
      *
-     * @throws \League\Flysystem\FileExistsException
+     * @throws \League\Flysystem\FilesystemException
      * @throws \PhpSchool\CliMenu\Exception\InvalidTerminalException
      */
     public function handle(): void

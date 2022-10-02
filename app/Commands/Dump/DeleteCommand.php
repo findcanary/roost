@@ -13,7 +13,7 @@ class DeleteCommand extends Command
 {
     use AppCommand;
 
-    const COMMAND = 'dump:delete';
+    public const COMMAND = 'dump:delete';
 
     /**
      * @var string
@@ -31,7 +31,7 @@ class DeleteCommand extends Command
     /**
      * @return void
      *
-     * @throws \League\Flysystem\FileNotFoundException
+     * @throws \League\Flysystem\FilesystemException
      * @throws \PhpSchool\CliMenu\Exception\InvalidTerminalException
      */
     public function handle(): void

@@ -12,7 +12,7 @@ class BackupCommand extends Command
 {
     use AppCommand;
 
-    const COMMAND = 'warden:db:backup';
+    public const COMMAND = 'warden:db:backup';
 
     /**
      * @var string

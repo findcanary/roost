@@ -13,7 +13,7 @@ class CreateCommand extends Command
 {
     use AppCommand;
 
-    const COMMAND = 'db:create';
+    public const COMMAND = 'db:create';
 
     /**
      * @var string

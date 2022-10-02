@@ -37,7 +37,7 @@ class AppServiceProvider extends ServiceProvider
     public function register(): void
     {
         $this->app->bind('app-config', static function () {
-            return new AppConfig;
+            return new AppConfig();
         });
     }
 }
